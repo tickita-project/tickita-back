@@ -23,4 +23,9 @@ public class Account extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
+
+    public void setUserInfo(String email, SocialType socialType) {
+        this.email = email;
+        this.socialType = socialType;
+    }
 }

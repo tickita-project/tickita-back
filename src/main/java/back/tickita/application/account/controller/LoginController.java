@@ -1,0 +1,34 @@
+package back.tickita.application.account.controller;
+
+import back.tickita.application.account.dto.response.LoginResponse;
+import back.tickita.application.account.service.OauthService;
+import back.tickita.security.oauth.AuthTokens;
+import back.tickita.security.oauth.AuthTokensGenerator;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@Tag(name = "소셜 로그인 API", description = "LoginController")
+@RestController
+@RequiredArgsConstructor
+public class LoginController {
+
+    private final OauthService oauthService;
+    private final AuthTokensGenerator authTokensGenerator;
+
+    @ResponseBody
+    @GetMapping("/login/oauth/kakao")
+    @Operation(summary = "kakao 로그인", description = "로그인 한 회원의 정보를 등록합니다.")
+    public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code) {
+        return ResponseEntity.ok(oauthService.kakaoLogin(code));
+    }
+
+    @PostMapping("/token/refresh/{id}")
+    @Operation(summary = "kakao 토큰 재발급", description = "만료된 토큰을 재발급 합니다.")
+    public AuthTokens setRefreshToken(@PathVariable(value = "id") Long accountId) {
+        return authTokensGenerator.generate(accountId);
+    }
+}
