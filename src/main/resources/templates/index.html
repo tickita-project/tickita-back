@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+</head>
+<body>
+
+<a th:href="@{/login}">Login</a>
+
+<div th:if="${session.account != null}">
+[[${session.account.email}]],[[${session.account.nickName}]] <a th:href="@{/logout}">logout</a>
+</div>
+
+</body>
+</html>
