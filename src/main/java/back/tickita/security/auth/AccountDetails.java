@@ -1,4 +1,4 @@
-package back.tickita.model.account;
+package back.tickita.security.auth;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;

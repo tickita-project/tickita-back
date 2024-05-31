@@ -1,13 +1,11 @@
-package back.tickita.controller;
+package back.tickita.application.account.controller;
 
-import back.tickita.config.jwt.JwtTokenProvider;
-import back.tickita.dto.token.JwtToken;
-import back.tickita.dto.token.TokenRefreshRequest;
+import back.tickita.application.token.JwtTokenProvider;
+import back.tickita.security.oauth.JwtToken;
+import back.tickita.security.oauth.TokenRefreshRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -58,8 +56,6 @@ public class AuthController {
         Map<String, Object> wrappedToken = new HashMap<>();
         wrappedToken.put("token", jwtToken);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(wrappedToken);
-        return ResponseEntity.ok(jsonString);
+        return ResponseEntity.ok(wrappedToken);
     }
 }

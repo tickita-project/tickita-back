@@ -1,4 +1,4 @@
-package back.tickita.domain.token;
+package back.tickita.domain.token.entity;
 
 import back.tickita.domain.account.entity.Account;
 import jakarta.persistence.*;
@@ -25,15 +25,4 @@ public class RefreshToken {
 
     @Column(nullable = false)
     private Instant expiryDate;
-
-//    @TimeToLive
-//    private Long expiration;
-//
-//    public static RefreshToken from(String username, String refreshToken, Long expirationTime) {
-//        return RefreshToken.builder()
-//                .id(username)
-//                .refreshToken(refreshToken)
-//                .expiration(expirationTime / 1000)
-//                .build();
-//    }
 }

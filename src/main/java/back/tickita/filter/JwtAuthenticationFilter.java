@@ -1,5 +1,6 @@
-package back.tickita.config.jwt;
+package back.tickita.filter;
 
+import back.tickita.application.token.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

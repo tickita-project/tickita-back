@@ -1,6 +1,6 @@
-package back.tickita.repository.token;
+package back.tickita.application.token.repository;
 
-import back.tickita.domain.token.RefreshToken;
+import back.tickita.domain.token.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

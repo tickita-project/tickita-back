@@ -1,4 +1,4 @@
-package back.tickita.repository.account;
+package back.tickita.application.account.repository;
 
 import back.tickita.domain.account.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;

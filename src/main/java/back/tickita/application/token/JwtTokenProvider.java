@@ -1,18 +1,14 @@
-package back.tickita.config.jwt;
+package back.tickita.application.token;
 
-import back.tickita.dto.token.JwtToken;
-import back.tickita.model.account.AccountDetails;
-import back.tickita.service.token.RefreshTokenService;
-import com.fasterxml.jackson.core.JsonGenerator;
+import back.tickita.security.oauth.JwtToken;
+import back.tickita.security.auth.AccountDetails;
+import back.tickita.application.token.service.RefreshTokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.jackson.JsonComponent;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 

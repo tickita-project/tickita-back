@@ -1,4 +1,4 @@
-package back.tickita.controller;
+package back.tickita.application.account.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;

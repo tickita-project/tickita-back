@@ -1,8 +1,8 @@
-package back.tickita.service.account;
+package back.tickita.application.account.service;
 
 import back.tickita.domain.account.entity.Account;
-import back.tickita.model.account.AccountDetails;
-import back.tickita.repository.account.AccountRepository;
+import back.tickita.security.auth.AccountDetails;
+import back.tickita.application.account.repository.AccountRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,9 +1,8 @@
-package back.tickita.service.account;
+package back.tickita.application.account.service;
 
 import back.tickita.domain.account.entity.Account;
-import back.tickita.domain.account.enums.Role;
 import back.tickita.domain.account.enums.SocialType;
-import back.tickita.repository.account.AccountRepository;
+import back.tickita.application.account.repository.AccountRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,8 +15,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
@@ -71,7 +68,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         account.setEmail(email);
         account.setNickName(oAuth2User.getAttribute("name"));
         account.setImage(oAuth2User.getAttribute("picture"));
-        account.setRole(Role.ROLE_USER);
         account.setSocialType(SocialType.GOOGLE);
         return accountRepository.save(account);
     }

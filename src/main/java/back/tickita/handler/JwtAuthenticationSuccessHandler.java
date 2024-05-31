@@ -1,6 +1,7 @@
 package back.tickita.handler;
 
-import back.tickita.config.jwt.JwtTokenProvider;
+import back.tickita.application.token.JwtTokenProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -10,34 +11,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-
-//@Component
-//public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-//
-//    @Autowired
-//    private JwtTokenProvider tokenProvider;
-//
-//    @Autowired
-//    private AccountRepository accountRepository;
-//
-//    @Override
-//    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-//                                        Authentication authentication) throws IOException {
-//
-//        String email = ((DefaultOAuth2User) authentication.getPrincipal()).getAttribute("email");
-//
-//        Optional<Account> accountOptional = accountRepository.findByEmail(email);
-//        if (accountOptional.isPresent()) {
-//            Account account = accountOptional.get();
-//            UserDetails userDetails = new org.springframework.security.core.userdetails.User(account.getEmail(),
-//                    "", Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
-//            String token = tokenProvider.generateToken(authentication);
-//            response.setHeader("Authorization", "Bearer " + token);
-//        }
-//
-//        response.sendRedirect("/");
-//    }
-//}
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @AllArgsConstructor
@@ -54,5 +29,6 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
         // 응답
         response.setContentType("application/json");
         response.getWriter().write(tokenJson);
+
     }
 }

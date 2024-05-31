@@ -1,4 +1,4 @@
-package back.tickita.dto.token;
+package back.tickita.security.oauth;
 
 import lombok.Getter;
 import lombok.Setter;

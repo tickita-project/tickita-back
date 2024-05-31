@@ -1,12 +1,9 @@
 package back.tickita.domain.account.entity;
 
 import back.tickita.common.BaseEntity;
-import back.tickita.domain.account.enums.Role;
 import back.tickita.domain.account.enums.SocialType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 @Entity
 @Getter
@@ -27,7 +24,9 @@ public class Account extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    public void setUserInfo(String email, SocialType socialType) {
+        this.email = email;
+        this.socialType = socialType;
+    }
 }
+

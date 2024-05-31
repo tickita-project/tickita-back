@@ -1,8 +1,8 @@
-package back.tickita.config.security;
+package back.tickita.config;
 
-import back.tickita.config.jwt.JwtAuthenticationFilter;
+import back.tickita.filter.JwtAuthenticationFilter;
 import back.tickita.handler.JwtAuthenticationSuccessHandler;
-import back.tickita.service.account.CustomOAuth2UserService;
+import back.tickita.application.account.service.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
