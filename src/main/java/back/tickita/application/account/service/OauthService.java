@@ -1,10 +1,11 @@
 package back.tickita.application.account.service;
 
-import back.tickita.application.account.dto.response.LoginResponse;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
-import back.tickita.security.oauth.AuthTokens;
+import back.tickita.domain.token.entity.Token;
+import back.tickita.domain.token.repository.TokenRepository;
 import back.tickita.security.oauth.AuthTokensGenerator;
+import back.tickita.security.response.TokenResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.webjars.NotFoundException;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import static back.tickita.domain.account.enums.SocialType.KAKAO;
@@ -31,6 +34,7 @@ import static back.tickita.domain.account.enums.SocialType.KAKAO;
 public class OauthService {
 
     private final AccountRepository accountRepository;
+    private final TokenRepository tokenRepository;
     private final AuthTokensGenerator authTokensGenerator;
 
     @Value("${spring.security.oauth2.client.registration.client-id}")
@@ -48,8 +52,12 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
 
+    public TokenResponse refresh(String refreshToken) {
+        Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new NotFoundException("리프레쉬 토큰이 존재하지않음"));
+        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now());
+    }
 
-    public LoginResponse kakaoLogin(String code) {
+    public TokenResponse kakaoLogin(String code) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getAccessToken(code);
 
@@ -57,9 +65,9 @@ public class OauthService {
         HashMap<String, Object> userInfo= getKakaoUserInfo(accessToken);
 
         //3. 카카오ID로 회원가입 & 로그인 처리
-        LoginResponse kakaoUserResponse= kakaoUserLogin(userInfo);
 
-        return kakaoUserResponse;
+
+        return kakaoUserLogin(userInfo);
     }
 
     //1. "인가 코드"로 "액세스 토큰" 요청
@@ -135,7 +143,7 @@ public class OauthService {
     }
 
     //3. 카카오ID로 회원가입 & 로그인 처리
-    public LoginResponse kakaoUserLogin(HashMap<String, Object> userInfo){
+    public TokenResponse kakaoUserLogin(HashMap<String, Object> userInfo){
 
         Long uid= Long.valueOf(userInfo.get("id").toString());
         String kakaoEmail = userInfo.get("email").toString();
@@ -148,7 +156,6 @@ public class OauthService {
             accountRepository.save(kakaoUser);
         }
         //토큰 생성
-        AuthTokens token=authTokensGenerator.generate(kakaoUser.getId());
-        return new LoginResponse(kakaoEmail, token);
+        return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now());
     }
 }

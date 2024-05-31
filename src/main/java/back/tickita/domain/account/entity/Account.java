@@ -2,6 +2,7 @@ package back.tickita.domain.account.entity;
 
 import back.tickita.common.BaseEntity;
 import back.tickita.domain.account.enums.SocialType;
+import io.jsonwebtoken.Jwts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

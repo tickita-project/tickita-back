@@ -6,10 +6,17 @@ import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.token.entity.Token;
 import back.tickita.domain.token.repository.TokenRepository;
 import back.tickita.exception.TickitaException;
+import back.tickita.filter.handler.LoginUserDetail;
+import back.tickita.security.response.TokenResponse;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -19,41 +26,58 @@ public class AuthTokensGenerator {
     private final TokenRepository tokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    private String BEARER_TYPE = "Bearer";
-    private long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60;    //1시간
-    private long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14;  // 14일
+    private static final String GRANT_TYPE = "Bearer";
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 300;
+    private static final  long REFRESH_TOKEN_EXPIRE_TIME = 3600;
+
+    //    private long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14;  // 14일
+    //    private long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60;    //1시간
 
     //id 받아 Access Token 생성
-    public AuthTokens generate(Long accountId) {
-        long now = System.currentTimeMillis();
-        Date accessTokenExpiredAt = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-        Date refreshTokenExpiredAt = new Date(now + REFRESH_TOKEN_EXPIRE_TIME);
+    public TokenResponse generate(Long accountId, LocalDateTime now) {
+        LocalDateTime accessTokenExpiredAt = now.plus(ACCESS_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
+        LocalDateTime refreshTokenExpiredAt =  now.plus(REFRESH_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
 
-        Token token = tokenRepository.findByAccountId(accountId).orElse(null);
+        String accessToken = jwtTokenProvider.accessTokenGenerate(accountId.toString(), accessTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli());
+        String refreshToken = jwtTokenProvider.refreshTokenGenerate(refreshTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli());
 
-        if (token != null) {
-            if (isAccessTokenExpired(token)) {
-                throw new TickitaException("토큰 만료됨");
+        Token findToken = tokenRepository.findByAccountId(accountId)
+                .orElse(null);
+        if (findToken == null) {
+            saveToken(accountId, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt);
+            return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt);
+        }
+            updateTokenProcess(now, findToken, accessToken, accessTokenExpiredAt, refreshToken,
+                    refreshTokenExpiredAt);
+
+            return new TokenResponse(accountId, GRANT_TYPE, findToken.getAccess(), findToken.getAccessExpiredAt(), findToken.getRefresh(), findToken.getRefreshExpiredAt());
+    }
+
+    private void updateTokenProcess(LocalDateTime now, Token findToken, String accessToken,
+                                    LocalDateTime accessTokenExpireAt, String refreshToken,
+                                    LocalDateTime refreshTokenExpireAt) {
+        if (findToken.getAccessExpiredAt().isBefore(now)) {
+            if(findToken.getRefreshExpiredAt().isBefore(now)) {
+                updateToken(findToken, accessToken, accessTokenExpireAt, refreshToken,
+                        refreshTokenExpireAt);
+            }else {
+                updateToken(findToken, accessToken, accessTokenExpireAt);
             }
-            String newAccessToken = jwtTokenProvider.accessTokenGenerate(accountId.toString(), accessTokenExpiredAt);
-            token.setAccess(newAccessToken);
-            token.setAccessExpiredAt(accessTokenExpiredAt);
-            tokenRepository.save(token);
-            return AuthTokens.of(newAccessToken, token.getRefresh(), BEARER_TYPE, ACCESS_TOKEN_EXPIRE_TIME / 1000L);
-        } else {
-
-            String accessToken = jwtTokenProvider.accessTokenGenerate(accountId.toString(), accessTokenExpiredAt);
-            String refreshToken = jwtTokenProvider.refreshTokenGenerate(refreshTokenExpiredAt);
-
-            Account account = accountRepository.findById(accountId)
-                    .orElseThrow(() -> new TickitaException("회원이 존재하지 않습니다."));
-            System.out.println("Account found with ID: " + account.getId());
-            tokenRepository.save(new Token(accessToken, refreshToken, accessTokenExpiredAt, refreshTokenExpiredAt, account));
-
-            return AuthTokens.of(accessToken, refreshToken, BEARER_TYPE, ACCESS_TOKEN_EXPIRE_TIME / 1000L);
         }
     }
-    private boolean isAccessTokenExpired(Token token) {
-        return token.getAccessExpiredAt().before(new Date());
+
+    private void updateToken(Token token, String accessToken, LocalDateTime accessTokenExpireAt, String refreshToken, LocalDateTime refreshTokenExpireAt) {
+        token.updateRefreshToken(refreshToken,refreshTokenExpireAt);
+        token.updateAccessToken(accessToken, accessTokenExpireAt);
+    }
+    private void updateToken(Token token, String accessToken, LocalDateTime accessTokenExpireAt) {
+        token.updateAccessToken(accessToken, accessTokenExpireAt);
+    }
+
+    private void saveToken(Long id, String accessToken, LocalDateTime accessTokenExpireAt,
+                           String refreshToken, LocalDateTime refreshTokenExpireAt) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new TickitaException("존재하지 않은 회원 정보입니다."));
+        tokenRepository.save(Token.create(accessToken, accessTokenExpireAt, account, refreshToken, refreshTokenExpireAt));
     }
 }

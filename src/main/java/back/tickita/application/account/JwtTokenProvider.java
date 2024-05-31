@@ -4,12 +4,8 @@ import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.token.entity.Token;
 import back.tickita.domain.token.repository.TokenRepository;
-import back.tickita.exception.TickitaException;
-import back.tickita.security.auth.PrincipalDetails;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import back.tickita.filter.handler.LoginUserDetail;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
@@ -21,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
@@ -43,16 +40,16 @@ public class JwtTokenProvider {
             this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String accessTokenGenerate(String subject, Date expiredAt) {
+    public String accessTokenGenerate(String subject, Long expiredAt) {
         return Jwts.builder()
                 .setSubject(subject)
-                .setExpiration(expiredAt)
+                .setExpiration(new Date(expiredAt))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
-    public String refreshTokenGenerate(Date expiredAt) {
+    public String refreshTokenGenerate(Long expiredAt) {
         return Jwts.builder()
-                .setExpiration(expiredAt)
+                .setExpiration(new Date(expiredAt))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -69,12 +66,20 @@ public class JwtTokenProvider {
         return false;
     }
 
-    public Authentication getAuthentication(String token) {
-        Account account = accountRepository.findById(getAccount(token)).orElse(null);
-        if (account == null) {
-            throw new RuntimeException();
+    public Authentication getAuthentication(String token, LocalDateTime now) {
+        Token findToken = tokenRepository.findTokenLoginInfo(token).orElse(null);
+
+        if (findToken == null) {
+            return null;
+        } else if (now.isAfter(findToken.getAccessExpiredAt())) {
+            throw new JwtException("토큰이 만료되었습니다.");
         }
-        PrincipalDetails loginUserDetail = new PrincipalDetails(account);
+        Account account = accountRepository.findById(getAccount(token))
+                .orElse(null);
+        if (account == null) {
+            return null;
+        }
+        LoginUserDetail loginUserDetail = new LoginUserDetail(account.getId(), account.getEmail());
         return new UsernamePasswordAuthenticationToken(loginUserDetail, "",
                 loginUserDetail.getAuthorities());
     }
