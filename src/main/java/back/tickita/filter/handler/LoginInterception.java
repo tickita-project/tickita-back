@@ -4,6 +4,7 @@ import back.tickita.application.account.annotaion.LoginUser;
 import back.tickita.application.account.dto.response.LoginUserInfo;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
+import back.tickita.exception.ErrorCode;
 import back.tickita.exception.TickitaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -34,10 +35,10 @@ public class LoginInterception implements HandlerMethodArgumentResolver {
         authRole = authRole.replaceAll("]","");
 
         if(authRole.equalsIgnoreCase("ANONYMOUS")) {
-            throw new TickitaException("접근 권한이 없습니다.");
+            throw new TickitaException(ErrorCode.FORBIDDEN_ACCESS);
         }
         Account account = accountRepository.findByEmail(
-                authentication.getName()).orElseThrow(() -> new TickitaException("토큰시간이 만료되었습니다."));
+                authentication.getName()).orElseThrow(() -> new TickitaException(ErrorCode.TOKEN_EXPIRE));
         return new LoginUserInfo(account.getId());
     }
 }
