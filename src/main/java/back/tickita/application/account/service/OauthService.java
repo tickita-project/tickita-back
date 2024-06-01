@@ -4,6 +4,8 @@ import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.token.entity.Token;
 import back.tickita.domain.token.repository.TokenRepository;
+import back.tickita.exception.ErrorCode;
+import back.tickita.exception.TickitaException;
 import back.tickita.security.oauth.AuthTokensGenerator;
 import back.tickita.security.response.TokenResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -54,9 +56,10 @@ public class OauthService {
 
     public TokenResponse refresh(String refreshToken) {
         Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new NotFoundException("리프레쉬 토큰이 존재하지않음"));
-        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now());
+        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false);
     }
 
+    @Transactional(noRollbackFor = TickitaException.class)
     public TokenResponse kakaoLogin(String code) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getAccessToken(code);
@@ -65,7 +68,6 @@ public class OauthService {
         HashMap<String, Object> userInfo= getKakaoUserInfo(accessToken);
 
         //3. 카카오ID로 회원가입 & 로그인 처리
-
 
         return kakaoUserLogin(userInfo);
     }
@@ -143,19 +145,22 @@ public class OauthService {
     }
 
     //3. 카카오ID로 회원가입 & 로그인 처리
+
     public TokenResponse kakaoUserLogin(HashMap<String, Object> userInfo){
 
-        Long uid= Long.valueOf(userInfo.get("id").toString());
         String kakaoEmail = userInfo.get("email").toString();
 
         Account kakaoUser = accountRepository.findByEmail(kakaoEmail).orElse(null);
+
+        boolean isFirst = false;
 
         if (kakaoUser == null) {    //회원가입
             kakaoUser = new Account();
             kakaoUser.setUserInfo(kakaoEmail, KAKAO);
             accountRepository.save(kakaoUser);
+            isFirst = true;
         }
         //토큰 생성
-        return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now());
+        return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), isFirst);
     }
 }
