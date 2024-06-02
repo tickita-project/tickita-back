@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 public class LoginController {
 
     private final OauthService oauthService;
-    private final AuthTokensGenerator authTokensGenerator;
 
     @GetMapping("/login/oauth/kakao")
     @Operation(summary = "kakao 로그인", description = "로그인 한 회원의 정보를 등록합니다.")
@@ -30,6 +29,5 @@ public class LoginController {
     @Operation(summary = "kakao 토큰 재발급", description = "만료된 토큰을 재발급 합니다.")
     public TokenResponse setRefreshToken(@RequestBody String refreshToken, LocalDateTime now) {
         return oauthService.refresh(refreshToken);
-        //return authTokensGenerator.generate(refreshToken);
     }
 }
