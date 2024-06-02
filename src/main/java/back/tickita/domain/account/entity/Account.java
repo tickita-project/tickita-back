@@ -7,10 +7,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Account extends BaseEntity {
 
     @Column(nullable = false)
@@ -28,5 +32,11 @@ public class Account extends BaseEntity {
     public void setUserInfo(String email, SocialType socialType) {
         this.email = email;
         this.socialType = socialType;
+    }
+
+    public void setAccountInfo(String nickName, String phoneNumber, String image) {
+        this.nickName = nickName;
+        this.phoneNumber = phoneNumber;
+        this.image = image;
     }
 }
