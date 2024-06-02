@@ -29,6 +29,8 @@ public class Account extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
+    private boolean addInfoCompleted = false;
+
     public void setUserInfo(String email, SocialType socialType) {
         this.email = email;
         this.socialType = socialType;
@@ -38,5 +40,9 @@ public class Account extends BaseEntity {
         this.nickName = nickName;
         this.phoneNumber = phoneNumber;
         this.image = image;
+    }
+
+    public void setAddInfoCompleted(boolean addInfoCompleted) {
+        this.addInfoCompleted = addInfoCompleted;
     }
 }

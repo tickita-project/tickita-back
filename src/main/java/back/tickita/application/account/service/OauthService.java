@@ -56,7 +56,7 @@ public class OauthService {
 
     public TokenResponse refresh(String refreshToken) {
         Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new NotFoundException("리프레쉬 토큰이 존재하지않음"));
-        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false);
+        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false, true);
     }
 
     @Transactional(noRollbackFor = TickitaException.class)
@@ -154,13 +154,15 @@ public class OauthService {
 
         boolean isFirst = false;
 
-        if (kakaoUser == null) {    //회원가입
+        if (kakaoUser == null) { //회원가입
             kakaoUser = new Account();
-            kakaoUser.setUserInfo(kakaoEmail, KAKAO);
+            kakaoUser.setUserInfo(kakaoEmail,KAKAO);
             accountRepository.save(kakaoUser);
             isFirst = true;
+        }else {
+            isFirst = false;
         }
         //토큰 생성
-        return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), isFirst);
+        return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), isFirst, kakaoUser.isAddInfoCompleted());
     }
 }
