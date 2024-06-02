@@ -22,6 +22,7 @@ public class InfoWriteService {
     public String updateAccountInfo(Long accountId, AccountInfoRequest accountRequest) throws IOException {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
         account.setAccountInfo(accountRequest.getNickName(), accountRequest.getPhoneNumber(), imageUploadService.uploadImage(accountRequest.getImgUrl()));
+        account.setAddInfoCompleted(true);
         return "성공";
     }
 }

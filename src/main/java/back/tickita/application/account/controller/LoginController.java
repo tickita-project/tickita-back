@@ -27,7 +27,7 @@ public class LoginController {
 
     @PostMapping("/token/refresh")
     @Operation(summary = "kakao 토큰 재발급", description = "만료된 토큰을 재발급 합니다.")
-    public TokenResponse setRefreshToken(@RequestBody String refreshToken, LocalDateTime now) {
+    public TokenResponse setRefreshToken(@RequestBody String refreshToken) {
         return oauthService.refresh(refreshToken);
     }
 }

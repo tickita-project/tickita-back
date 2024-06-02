@@ -13,7 +13,8 @@ public record TokenResponse(
         String refreshToken,
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime refreshTokenExpireAt,
-        boolean isFirst
+        boolean isFirst,
+        boolean addInfoCompleted
 )
 {
 }

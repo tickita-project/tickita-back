@@ -28,7 +28,7 @@ public class AuthTokensGenerator {
     private static final  long REFRESH_TOKEN_EXPIRE_TIME = 3600;
 
     //id 받아 Access Token 생성
-    public TokenResponse generate(Long accountId, LocalDateTime now, boolean isFirst) {
+    public TokenResponse generate(Long accountId, LocalDateTime now, boolean isFirst, boolean addInfoCompleted) {
         LocalDateTime accessTokenExpiredAt = now.plus(ACCESS_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
         LocalDateTime refreshTokenExpiredAt =  now.plus(REFRESH_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
 
@@ -39,12 +39,12 @@ public class AuthTokensGenerator {
                 .orElse(null);
         if (findToken == null) {
             saveToken(accountId, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt);
-            return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt, isFirst);
+            return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt, isFirst, addInfoCompleted);
         }
             updateTokenProcess(now, findToken, accessToken, accessTokenExpiredAt, refreshToken,
                     refreshTokenExpiredAt);
 
-            return new TokenResponse(accountId, GRANT_TYPE, findToken.getAccess(), findToken.getAccessExpiredAt(), findToken.getRefresh(), findToken.getRefreshExpiredAt(), isFirst);
+            return new TokenResponse(accountId, GRANT_TYPE, findToken.getAccess(), findToken.getAccessExpiredAt(), findToken.getRefresh(), findToken.getRefreshExpiredAt(), isFirst, addInfoCompleted);
     }
 
     private void updateTokenProcess(LocalDateTime now, Token findToken, String accessToken,
