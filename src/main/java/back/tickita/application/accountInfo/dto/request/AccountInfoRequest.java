@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @AllArgsConstructor
 public class AccountInfoRequest {
-    private MultipartFile imgUrl;
+    private Long accountId;
     private String nickName;
     private String phoneNumber;
 }

@@ -1,6 +1,7 @@
 package back.tickita.application.accountInfo.controller;
 
 
+import back.tickita.application.accountInfo.dto.ImageRequest;
 import back.tickita.application.accountInfo.dto.request.AccountInfoRequest;
 import back.tickita.application.accountInfo.dto.response.AccountInfoResponse;
 import back.tickita.application.accountInfo.service.InfoReadService;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -22,8 +24,8 @@ public class AccountInfoController {
 
     @PostMapping
     @Operation(summary = "회원 추가 정보 입력", description = "로그인 한 회원의 추가 정보를 등록합니다.")
-    public String updateAccountInfo(@RequestParam Long accountId, AccountInfoRequest accountRequest) throws IOException {
-        return infoWriteService.updateAccountInfo(accountId, accountRequest);
+    public String updateAccountInfo(@RequestPart(value = "file", required = false) MultipartFile multipartFile , @RequestPart(name = "request") AccountInfoRequest accountRequest) throws IOException {
+        return infoWriteService.updateAccountInfo(multipartFile,accountRequest);
     }
 
     @GetMapping("/{accountId}")
