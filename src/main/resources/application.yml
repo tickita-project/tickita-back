@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    url: jdbc:mysql://127.0.0.1:3306/tickita?useUnicode=true&serverTimezone=Asia/Seoul
-    password: ${DB_PW}
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
   application:
     name: tickita
   jpa:
@@ -21,15 +21,18 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_PW}
-            scope: profile, email
-        provider:
-          google:
-            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
             token-uri: https://oauth2.googleapis.com/token
-            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-            user-name-attribute: sub
+            resource-uri: https://www.googleapis.com/oauth2/v2/userinfo
+            scope: profile, email
+#        provider:
+#          google:
+#            authorization-uri: https://accounts.google.com/o/oauth2/auth
+#            token-uri: https://oauth2.googleapis.com/token
+#            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+#            user-name-attribute: sub
 
 jwt:
-  secret: ${JWT_SECRET}
-  accessTokenExpirationMs: 3600000 # 1 hour
-  refreshTokenExpirationMs: 604800000 # 7 days = 86400000 * 7
+  access-token-expire: 300
+  refresh-token-expire: 3600
+  secret-key: ${JWT_KEY}

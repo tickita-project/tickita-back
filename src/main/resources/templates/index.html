@@ -1,16 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>index</title>
+    <title>Home Page</title>
 </head>
 <body>
-
-<a th:href="@{/login}">Login</a>
-
-<div th:if="${session.account != null}">
-[[${session.account.email}]],[[${session.account.nickName}]] <a th:href="@{/logout}">logout</a>
-</div>
-
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    window.location.replace("/login");
+    /*]]>*/
+</script>
 </body>
 </html>

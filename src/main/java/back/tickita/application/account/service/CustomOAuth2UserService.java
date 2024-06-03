@@ -1,74 +1,42 @@
 package back.tickita.application.account.service;
 
+import back.tickita.application.account.dto.OAuth2UserInfo;
 import back.tickita.domain.account.entity.Account;
-import back.tickita.domain.account.enums.SocialType;
-import back.tickita.application.account.repository.AccountRepository;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import back.tickita.domain.account.repository.AccountRepository;
+import back.tickita.security.auth.PrincipalDetails;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.Map;
 
+@RequiredArgsConstructor
 @Service
-public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final AccountRepository accountRepository;
-    private final HttpSession httpSession;
 
-    @Autowired
-    public CustomOAuth2UserService(AccountRepository accountRepository, HttpSession httpSession) {
-        this.accountRepository = accountRepository;
-        this.httpSession = httpSession;
-    }
-
+    @Transactional
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-        OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-//        String registrationId = userRequest.getClientRegistration().getRegistrationId();
-//        String userNameAttributeName = userRequest.getClientRegistration()
-//                .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+        Map<String, Object> oAuth2UserAttributes = super.loadUser(userRequest).getAttributes();
 
-//        String email = getEmail(oAuth2User, registrationId);
-        String email = oAuth2User.getAttribute("email");
-        if (email == null) {
-            throw new OAuth2AuthenticationException("Email not found in OAuth2 user attributes");
-        }
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfo.ofGoogle(oAuth2UserAttributes);
 
-        Account account = accountRepository.findByEmail(email)
-                .orElseGet(() -> createNewAccount(oAuth2User, email));
+        Account account = accountRepository.findByEmail(oAuth2UserInfo.email())
+                .orElseGet(() -> createNewAccount(oAuth2UserInfo));
 
-        httpSession.setAttribute("account", account);
-
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                oAuth2User.getAttributes(),
-                "email"
-        );
+        return new PrincipalDetails(account, oAuth2UserAttributes);
     }
 
-//    private String getEmail(OAuth2User oAuth2User, String registrationId) {
-//        if ("google".equals(registrationId)) {
-//            return oAuth2User.getAttribute("email");
-//        } else {
-//            throw new OAuth2AuthenticationException("허용되지 않는 인증입니다");
-//        }
-//    }
-
-    private Account createNewAccount(OAuth2User oAuth2User, String email) {
-        Account account = new Account();
-        account.setEmail(email);
-        account.setNickName(oAuth2User.getAttribute("name"));
-        account.setImage(oAuth2User.getAttribute("picture"));
-        account.setSocialType(SocialType.GOOGLE);
-        return accountRepository.save(account);
+    private Account createNewAccount(OAuth2UserInfo oAuth2UserInfo) {
+        Account newAccount = oAuth2UserInfo.toEntity();
+        return accountRepository.save(newAccount);
     }
 }
+
