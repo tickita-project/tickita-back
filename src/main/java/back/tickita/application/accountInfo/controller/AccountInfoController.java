@@ -4,6 +4,7 @@ package back.tickita.application.accountInfo.controller;
 import back.tickita.application.accountInfo.dto.ImageRequest;
 import back.tickita.application.accountInfo.dto.request.AccountInfoRequest;
 import back.tickita.application.accountInfo.dto.response.AccountInfoResponse;
+import back.tickita.application.accountInfo.dto.response.AccountResponse;
 import back.tickita.application.accountInfo.service.InfoReadService;
 import back.tickita.application.accountInfo.service.InfoWriteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,9 +29,15 @@ public class AccountInfoController {
         return infoWriteService.updateAccountInfo(multipartFile,accountRequest);
     }
 
-    @GetMapping("/{accountId}")
+    @GetMapping("/info-all/{accountId}")
     @Operation(summary = "회원 추가 정보 조회", description = "로그인 한 회원의 정보를 조회합니다.")
     public AccountInfoResponse findAccountInfo(@PathVariable(value = "accountId") Long accountId){
         return infoReadService.findAccountInfo(accountId);
+    }
+
+    @GetMapping("/{accountId}")
+    @Operation(summary = "회원 이메일 조회", description = "로그인 한 회원의 이메일을 조회합니다.")
+    public AccountResponse findAccountEmail(@PathVariable(value = "accountId") Long accountId){
+        return infoReadService.findAccountEmail(accountId);
     }
 }
