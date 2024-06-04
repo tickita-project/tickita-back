@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -56,7 +57,7 @@ public class OauthService {
 
     public TokenResponse refresh(String refreshToken) {
         Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new NotFoundException("리프레쉬 토큰이 존재하지않음"));
-        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false, true);
+        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false);
     }
 
     @Transactional(noRollbackFor = TickitaException.class)
@@ -152,17 +153,13 @@ public class OauthService {
 
         Account kakaoUser = accountRepository.findByEmail(kakaoEmail).orElse(null);
 
-        boolean isFirst = false;
-
-        if (kakaoUser == null) { //회원가입
+        if (kakaoUser == null || !kakaoUser.isComplete()) { //회원가입
             kakaoUser = new Account();
             kakaoUser.setUserInfo(kakaoEmail,KAKAO);
+            kakaoUser.setIsComplete(false);
             accountRepository.save(kakaoUser);
-            isFirst = true;
-        }else {
-            isFirst = false;
+            return new TokenResponse(null, null, null, null, null, null, false);
         }
-        //토큰 생성
-        return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), isFirst, kakaoUser.isAddInfoCompleted());
+            return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), kakaoUser.isComplete());
     }
 }
