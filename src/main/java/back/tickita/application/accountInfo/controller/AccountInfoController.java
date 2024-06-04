@@ -10,6 +10,7 @@ import back.tickita.security.response.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,13 +26,13 @@ public class AccountInfoController {
 
     @PostMapping
     @Operation(summary = "회원 추가 정보 입력", description = "로그인 한 회원의 추가 정보를 등록합니다.")
-    public TokenResponse updateAccountInfo(@RequestPart(name = "request") AccountInfoRequest accountRequest) {
+    public TokenResponse updateAccountInfo(@RequestBody AccountInfoRequest accountRequest) {
         return infoWriteService.updateAccountInfo(accountRequest);
     }
 
-    @PostMapping("/{accountId}")
+    @PostMapping(value = "/img" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "회원 추가 정보 이미지 등록", description = "로그인 한 회원의 추가 정보 이미지를 등록합니다.")
-    public String updateAccountInfo(@RequestPart(value = "file", required = false) MultipartFile multipartFile, @PathVariable(value = "accountId") Long accountId) throws IOException {
+    public String updateAccountInfo(@RequestPart(value = "file", required = false) MultipartFile multipartFile, @RequestPart(name = "accountId") Long accountId) throws IOException {
         return infoWriteService.updateAccountImg(multipartFile, accountId);
     }
 
