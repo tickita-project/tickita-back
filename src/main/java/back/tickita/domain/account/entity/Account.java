@@ -29,20 +29,24 @@ public class Account extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
-    private boolean addInfoCompleted = false;
+    private boolean isComplete = false;
 
     public void setUserInfo(String email, SocialType socialType) {
         this.email = email;
         this.socialType = socialType;
     }
 
-    public void setAccountInfo(String nickName, String phoneNumber, String image) {
+    public void setAccountInfo(String nickName, String phoneNumber) {
         this.nickName = nickName;
         this.phoneNumber = phoneNumber;
+//        this.image = image;
+    }
+
+    public void setAccountImg(String image) {
         this.image = image;
     }
 
-    public void setAddInfoCompleted(boolean addInfoCompleted) {
-        this.addInfoCompleted = addInfoCompleted;
+    public void setIsComplete(boolean isComplete) {
+        this.isComplete = isComplete;
     }
 }
