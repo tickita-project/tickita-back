@@ -37,14 +37,15 @@ public class AuthTokensGenerator {
 
         Token findToken = tokenRepository.findByAccountId(accountId)
                 .orElse(null);
+        Account account = accountRepository.findById(accountId).orElse(null);
         if (findToken == null) {
             saveToken(accountId, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt);
-            return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt, isComplete);
+            return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt, isComplete, account.getEmail(), account.getImage(), account.getNickName(), account.getPhoneNumber());
         }
             updateTokenProcess(now, findToken, accessToken, accessTokenExpiredAt, refreshToken,
                     refreshTokenExpiredAt);
 
-            return new TokenResponse(accountId, GRANT_TYPE, findToken.getAccess(), findToken.getAccessExpiredAt(), findToken.getRefresh(), findToken.getRefreshExpiredAt(), isComplete);
+            return new TokenResponse(accountId, GRANT_TYPE, findToken.getAccess(), findToken.getAccessExpiredAt(), findToken.getRefresh(), findToken.getRefreshExpiredAt(), isComplete, account.getEmail(), account.getImage(), account.getNickName(), account.getPhoneNumber());
     }
 
     private void updateTokenProcess(LocalDateTime now, Token findToken, String accessToken,
