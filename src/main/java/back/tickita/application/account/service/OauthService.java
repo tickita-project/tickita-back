@@ -159,7 +159,8 @@ public class OauthService {
             kakaoUser.setIsComplete(false);
             accountRepository.save(kakaoUser);
         } if (!kakaoUser.isComplete()){
-            return new TokenResponse(null, null, null, null, null, null, false);
+            return new TokenResponse(kakaoUser.getId(), null, null, null, null, null, false,
+                    kakaoUser.getEmail(), null, null, null);
         }
             return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), kakaoUser.isComplete());
     }
