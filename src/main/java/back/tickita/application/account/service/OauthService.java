@@ -153,11 +153,12 @@ public class OauthService {
 
         Account kakaoUser = accountRepository.findByEmail(kakaoEmail).orElse(null);
 
-        if (kakaoUser == null || !kakaoUser.isComplete()) { //회원가입
+        if (kakaoUser == null) {//회원가입
             kakaoUser = new Account();
             kakaoUser.setUserInfo(kakaoEmail,KAKAO);
             kakaoUser.setIsComplete(false);
             accountRepository.save(kakaoUser);
+        } if (!kakaoUser.isComplete()){
             return new TokenResponse(null, null, null, null, null, null, false);
         }
             return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), kakaoUser.isComplete());
