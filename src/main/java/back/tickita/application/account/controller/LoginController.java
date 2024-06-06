@@ -10,8 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
 @Tag(name = "소셜 로그인 API", description = "LoginController")
 @RestController
 @RequiredArgsConstructor
