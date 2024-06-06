@@ -14,4 +14,7 @@ public class AccountInfoRequest {
 
     @Schema(description = "회원 전화번호", example = "01012345678")
     private String phoneNumber;
+
+    @Schema(description = "imgUrl")
+    private String imgUrl;
 }

@@ -36,13 +36,9 @@ public class Account extends BaseEntity {
         this.socialType = socialType;
     }
 
-    public void setAccountInfo(String nickName, String phoneNumber) {
+    public void setAccountInfo(String nickName, String phoneNumber, String image) {
         this.nickName = nickName;
         this.phoneNumber = phoneNumber;
-//        this.image = image;
-    }
-
-    public void setAccountImg(String image) {
         this.image = image;
     }
 
