@@ -1,7 +1,6 @@
 package back.tickita.application.account.controller;
 
 import back.tickita.application.account.service.OauthService;
-import back.tickita.security.oauth.AuthTokensGenerator;
 
 import back.tickita.security.response.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
