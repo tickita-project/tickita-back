@@ -2,6 +2,7 @@ package back.tickita.application.accountInfo.controller;
 
 
 import back.tickita.application.accountInfo.dto.request.AccountInfoRequest;
+import back.tickita.application.accountInfo.dto.response.AccountImgUrlResponse;
 import back.tickita.application.accountInfo.dto.response.AccountInfoResponse;
 import back.tickita.application.accountInfo.dto.response.AccountResponse;
 import back.tickita.application.accountInfo.service.InfoReadService;
@@ -30,10 +31,10 @@ public class AccountInfoController {
         return infoWriteService.updateAccountInfo(accountRequest);
     }
 
-    @PostMapping(value = "/img" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "/img" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "회원 추가 정보 이미지 등록", description = "로그인 한 회원의 추가 정보 이미지를 등록합니다.")
-    public String updateAccountInfo(@RequestPart(value = "file", required = false) MultipartFile multipartFile, @RequestPart(name = "accountId") Long accountId) throws IOException {
-        return infoWriteService.updateAccountImg(multipartFile, accountId);
+    public AccountImgUrlResponse updateAccountInfo(@RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+        return infoWriteService.updateAccountImg(multipartFile);
     }
 
     @GetMapping("/all/{accountId}")

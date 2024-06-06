@@ -1,6 +1,7 @@
 package back.tickita.application.accountInfo.service;
 
 import back.tickita.application.accountInfo.dto.request.AccountInfoRequest;
+import back.tickita.application.accountInfo.dto.response.AccountImgUrlResponse;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.exception.ErrorCode;
@@ -27,17 +28,12 @@ public class InfoWriteService {
     public TokenResponse updateAccountInfo(AccountInfoRequest accountRequest) {
         Account account = accountRepository.findById(accountRequest.getAccountId()).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
         account.setIsComplete(true);
-        account.setAccountInfo(accountRequest.getNickName(), accountRequest.getPhoneNumber());
+        account.setAccountInfo(accountRequest.getNickName(), accountRequest.getPhoneNumber(), accountRequest.getImgUrl());
         return authTokensGenerator.generate(account.getId(), LocalDateTime.now(), true);
     }
 
-    public String updateAccountImg(MultipartFile multipartFile, Long accountId) throws IOException {
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-        if (multipartFile.isEmpty() || multipartFile == null){
-            account.setAccountImg(null);
-        }else {
-            account.setAccountImg(imageUploadService.uploadImage(multipartFile));
-        }
-        return "성공";
+    public AccountImgUrlResponse updateAccountImg(MultipartFile multipartFile) throws IOException {
+        String imgUrl = imageUploadService.uploadImage(multipartFile);
+        return new AccountImgUrlResponse(imgUrl);
     }
 }
