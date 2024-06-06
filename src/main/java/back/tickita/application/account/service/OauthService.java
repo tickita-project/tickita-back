@@ -5,8 +5,11 @@ import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.token.entity.Token;
 import back.tickita.domain.token.repository.TokenRepository;
+import back.tickita.exception.ErrorCode;
+import back.tickita.exception.TickitaException;
 import back.tickita.security.oauth.AuthTokensGenerator;
 import back.tickita.security.response.TokenResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,30 +30,31 @@ import java.util.HashMap;
 @Transactional
 public class OauthService {
 
-    private AccountRepository accountRepository;
-    private TokenRepository tokenRepository;
-    private AuthTokensGenerator authTokensGenerator;
+    private final AccountRepository accountRepository;
+    private final TokenRepository tokenRepository;
+    private final AuthTokensGenerator authTokensGenerator;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String GOOGLE_CLIENT_ID;
 
-    @Value("${spring.security.oauth2.client.registration.google.client-secret")
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String GOOGLE_CLIENT_SECRET;
 
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri")
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
     private String GOOGLE_REDIRECT_URI;
 
-    @Value("${spring.security.oauth2.client.provider.google.token-uri")
+    @Value("${spring.security.oauth2.client.provider.google.token-uri}")
     private String GOOGLE_TOKEN_URI;
 
-    @Value("${spring.security.oauth2.client.provider.google.user-info-uri")
+    @Value("${spring.security.oauth2.client.provider.google.user-info-uri}")
     private String GOOGLE_USER_INFO_URI;
 
     public TokenResponse refresh(String refreshToken) {
         Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new NotFoundException("리프레쉬 토큰이 존재하지않음"));
-        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now());
+        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false);
     }
 
+    @Transactional(noRollbackFor = TickitaException.class)
     public TokenResponse googleLogin(String code) {
         // 1. 인가 코드로 액세스 토큰 요청
         String accessToken = getGoogleAccessToken(code);
@@ -122,7 +126,7 @@ public class OauthService {
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfo.ofGoogle(userInfo);
         String email = oAuth2UserInfo.email();
         Account account = accountRepository.findByEmail(email).orElseGet(() -> createNewAccount(oAuth2UserInfo));
-        return authTokensGenerator.generate(account.getId(), LocalDateTime.now());
+        return authTokensGenerator.generate(account.getId(), LocalDateTime.now(), false);
     }
 
     private Account createNewAccount(OAuth2UserInfo oAuth2UserInfo) {

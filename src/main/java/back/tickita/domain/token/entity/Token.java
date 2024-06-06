@@ -5,15 +5,15 @@ import back.tickita.domain.account.entity.Account;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
-@AllArgsConstructor
 public class Token extends BaseEntity {
     private String access;
     private String refresh;

@@ -1,17 +1,19 @@
 package back.tickita.domain.account.entity;
 
 import back.tickita.common.BaseEntity;
-import back.tickita.domain.account.enums.Role;
 import back.tickita.domain.account.enums.SocialType;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class Account extends BaseEntity {
 
     @Column(nullable = false)
@@ -26,11 +28,24 @@ public class Account extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private boolean isComplete = false;
 
     public void setUserInfo(String email, SocialType socialType) {
         this.email = email;
         this.socialType = socialType;
+    }
+
+    public void setAccountInfo(String nickName, String phoneNumber) {
+        this.nickName = nickName;
+        this.phoneNumber = phoneNumber;
+//        this.image = image;
+    }
+
+    public void setAccountImg(String image) {
+        this.image = image;
+    }
+
+    public void setIsComplete(boolean isComplete) {
+        this.isComplete = isComplete;
     }
 }

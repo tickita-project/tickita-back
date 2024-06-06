@@ -37,7 +37,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         Account account = accountRepository.findByEmail(authentication.getName()).orElse(null);
 
         // 액세스 토큰 및 리프레시 토큰 생성
-        TokenResponse token = authTokensGenerator.generate(account.getId(), LocalDateTime.now());
+        TokenResponse token = authTokensGenerator.generate(account.getId(), LocalDateTime.now(), false);
 
         // ObjectMapper 객체 생성
         ObjectMapper objectMapper = new ObjectMapper();
