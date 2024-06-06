@@ -89,12 +89,17 @@ public class OauthService {
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
         RestTemplate rt = new RestTemplate();
-        ResponseEntity<String> response = rt.exchange(
-                KAKAO_TOKEN_URI,
-                HttpMethod.POST,
-                kakaoTokenRequest,
-                String.class
-        );
+        ResponseEntity<String> response;
+        try {
+            response = rt.exchange(
+                    KAKAO_TOKEN_URI,
+                    HttpMethod.POST,
+                    kakaoTokenRequest,
+                    String.class
+            );
+        }catch (Exception e){
+            throw new TickitaException(ErrorCode.INVALID_AUTH_CODE);
+        }
 
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         String responseBody = response.getBody();
@@ -104,7 +109,13 @@ public class OauthService {
             jsonNode = objectMapper.readTree(responseBody);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            throw new TickitaException(ErrorCode.KAKAO_API_ERROR);
         }
+
+        if (jsonNode.has("error")) {
+            throw new TickitaException(ErrorCode.INVALID_AUTH_CODE);
+        }
+
         return jsonNode.get("access_token").asText(); //토큰 전송
     }
 
