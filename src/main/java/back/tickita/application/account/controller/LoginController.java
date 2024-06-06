@@ -1,9 +1,9 @@
 package back.tickita.application.account.controller;
 import back.tickita.application.account.service.OauthService;
+import lombok.RequiredArgsConstructor;
 import back.tickita.security.response.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
