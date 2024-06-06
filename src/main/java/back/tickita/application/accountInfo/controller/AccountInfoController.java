@@ -27,13 +27,13 @@ public class AccountInfoController {
 
     @PostMapping
     @Operation(summary = "회원 추가 정보 입력", description = "로그인 한 회원의 추가 정보를 등록합니다.")
-    public TokenResponse updateAccountInfo(@RequestBody AccountInfoRequest accountRequest) {
+    public TokenResponse updateAccountInfo(@RequestBody AccountInfoRequest accountRequest){
         return infoWriteService.updateAccountInfo(accountRequest);
     }
 
-    @GetMapping(value = "/img" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/img" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "회원 추가 정보 이미지 등록", description = "로그인 한 회원의 추가 정보 이미지를 등록합니다.")
-    public AccountImgUrlResponse updateAccountInfo(@RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+    public AccountImgUrlResponse updateAccountInfo(@RequestPart(required = false) MultipartFile multipartFile) throws IOException {
         return infoWriteService.updateAccountImg(multipartFile);
     }
 
