@@ -24,20 +24,17 @@ import java.util.Date;
 public class JwtTokenProvider {
     private final AccountRepository accountRepository;
     private final TokenRepository tokenRepository;
-
     @Value("${jwt.secret-key}")
     private String secretKey;
     private Key key;
-
     public JwtTokenProvider(AccountRepository accountRepository, TokenRepository tokenRepository) {
         this.accountRepository = accountRepository;
         this.tokenRepository = tokenRepository;
     }
-
     @PostConstruct
     public void init() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-            this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String accessTokenGenerate(String subject, Long expiredAt) {
@@ -53,7 +50,6 @@ public class JwtTokenProvider {
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
-
     public Boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();

@@ -1,5 +1,4 @@
 package back.tickita.security.oauth;
-
 import back.tickita.application.account.JwtTokenProvider;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
@@ -27,25 +26,25 @@ public class AuthTokensGenerator {
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 300;
     private static final  long REFRESH_TOKEN_EXPIRE_TIME = 3600;
 
-    //id 받아 Access Token 생성
+    // id 받아 Access Token 생성
     public TokenResponse generate(Long accountId, LocalDateTime now, boolean isComplete) {
         LocalDateTime accessTokenExpiredAt = now.plus(ACCESS_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
         LocalDateTime refreshTokenExpiredAt =  now.plus(REFRESH_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
-
         String accessToken = jwtTokenProvider.accessTokenGenerate(accountId.toString(), accessTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli());
         String refreshToken = jwtTokenProvider.refreshTokenGenerate(refreshTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli());
 
-        Token findToken = tokenRepository.findByAccountId(accountId)
-                .orElse(null);
+        Token findToken = tokenRepository.findByAccountId(accountId).orElse(null);
         Account account = accountRepository.findById(accountId).orElse(null);
         if (findToken == null) {
             saveToken(accountId, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt);
-            return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt, isComplete, account.getEmail(), account.getImage(), account.getNickName(), account.getPhoneNumber());
+            return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt,
+                    isComplete, account.getEmail(), account.getImage(), account.getNickName(), account.getPhoneNumber());
         }
-            updateTokenProcess(now, findToken, accessToken, accessTokenExpiredAt, refreshToken,
-                    refreshTokenExpiredAt);
+        updateTokenProcess(now, findToken, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt);
 
-            return new TokenResponse(accountId, GRANT_TYPE, findToken.getAccess(), findToken.getAccessExpiredAt(), findToken.getRefresh(), findToken.getRefreshExpiredAt(), isComplete, account.getEmail(), account.getImage(), account.getNickName(), account.getPhoneNumber());
+        return new TokenResponse(accountId, GRANT_TYPE, findToken.getAccess(), findToken.getAccessExpiredAt(),
+                findToken.getRefresh(), findToken.getRefreshExpiredAt(), isComplete, account.getEmail(), account.getImage(),
+                account.getNickName(), account.getPhoneNumber());
     }
 
     private void updateTokenProcess(LocalDateTime now, Token findToken, String accessToken,

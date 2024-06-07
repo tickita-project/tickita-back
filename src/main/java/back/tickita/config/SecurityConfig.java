@@ -37,7 +37,6 @@ public class SecurityConfig {
                                         AntPathRequestMatcher.antMatcher("/**"),
                                         AntPathRequestMatcher.antMatcher("/login/**")
                                 ).permitAll()
-
                 )
                 .headers(
                         headersConfigurer ->
@@ -46,7 +45,6 @@ public class SecurityConfig {
                                                 HeadersConfigurer.FrameOptionsConfig::sameOrigin
                                         )
                 );
-
         return http.build();
     }
 
