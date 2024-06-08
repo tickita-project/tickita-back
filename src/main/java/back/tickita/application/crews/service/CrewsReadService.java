@@ -41,7 +41,7 @@ public class CrewsReadService {
                         crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewList.getAccount().getEmail(), crewInfoList.getCrewRole().name()))
                 .collect(Collectors.toList());
 
-        return new CrewInfoResponse(crews.getCrewName(), crews.getLabelColor(), crewMemberInfos);
+        return new CrewInfoResponse(crews.getCrewName(), crews.getLabelColor(), crews.getId(), crewMemberInfos);
     }
 
     public CrewAllResponse getCrewAll(Long accountId) {

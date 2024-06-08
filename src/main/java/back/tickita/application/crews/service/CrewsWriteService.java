@@ -33,6 +33,6 @@ public class CrewsWriteService {
 
         CrewList createCrew = new CrewList(crews, account, CrewRole.OWNER, CrewAccept.ACCEPT);
         crewListRepository.save(createCrew);
-        return new CrewCreateResponse(account.getId(), crewRequest.getCrewName(), crewRequest.getLabelColor());
+        return new CrewCreateResponse(account.getId(), crewRequest.getCrewName(), crewRequest.getLabelColor(), crews.getId());
     }
 }

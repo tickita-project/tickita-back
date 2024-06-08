@@ -16,4 +16,7 @@ public class CrewCreateResponse {
 
     @Schema(description = "그룹 색상", example = "F5C92E")
     private String labelColor;
+
+    @Schema(description = "그룹 id", example = "1")
+    private Long crewId;
 }
