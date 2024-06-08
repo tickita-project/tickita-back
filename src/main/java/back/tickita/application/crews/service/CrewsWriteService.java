@@ -1,5 +1,6 @@
 package back.tickita.application.crews.service;
 
+import back.tickita.application.account.dto.request.LoginUserInfo;
 import back.tickita.application.crews.dto.request.CrewRequest;
 import back.tickita.application.crews.dto.response.CrewCreateResponse;
 import back.tickita.domain.account.entity.Account;

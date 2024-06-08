@@ -1,5 +1,6 @@
 package back.tickita.domain.account.repository;
 
+import back.tickita.application.account.dto.request.LoginUserInfo;
 import back.tickita.domain.account.entity.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
