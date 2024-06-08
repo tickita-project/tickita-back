@@ -55,9 +55,9 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
 
-    public TokenResponse refresh(String refreshToken) {
+    public TokenResponse refresh(String refreshToken, String role) {
         Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new NotFoundException("리프레쉬 토큰이 존재하지않음"));
-        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false);
+        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false, role);
     }
 
     @Transactional(noRollbackFor = TickitaException.class)
@@ -173,6 +173,6 @@ public class OauthService {
             return new TokenResponse(kakaoUser.getId(), null, null, null, null, null, false,
                     kakaoUser.getEmail(), null, null, null);
         }
-            return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), kakaoUser.isComplete());
+            return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), kakaoUser.isComplete(), String.valueOf(kakaoUser.getRole()));
     }
 }

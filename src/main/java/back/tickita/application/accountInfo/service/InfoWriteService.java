@@ -25,11 +25,11 @@ public class InfoWriteService {
     private final ImageUploadService imageUploadService;
     private final AuthTokensGenerator authTokensGenerator;
 
-    public TokenResponse updateAccountInfo(AccountInfoRequest accountRequest){
+    public TokenResponse updateAccountInfo(AccountInfoRequest accountRequest, String role){
         Account account = accountRepository.findById(accountRequest.getAccountId()).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
         account.setIsComplete(true);
         account.setAccountInfo(accountRequest.getNickName(), accountRequest.getPhoneNumber(), accountRequest.getImgUrl());
-        return authTokensGenerator.generate(account.getId(), LocalDateTime.now(), true);
+        return authTokensGenerator.generate(account.getId(), LocalDateTime.now(), true, role);
     }
 
     public AccountImgUrlResponse updateAccountImg(MultipartFile multipartFile) throws IOException {

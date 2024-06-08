@@ -28,12 +28,12 @@ public class AuthTokensGenerator {
     private static final  long REFRESH_TOKEN_EXPIRE_TIME = 3600;
 
     //id 받아 Access Token 생성
-    public TokenResponse generate(Long accountId, LocalDateTime now, boolean isComplete) {
+    public TokenResponse generate(Long accountId, LocalDateTime now, boolean isComplete, String role) {
         LocalDateTime accessTokenExpiredAt = now.plus(ACCESS_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
         LocalDateTime refreshTokenExpiredAt =  now.plus(REFRESH_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
 
-        String accessToken = jwtTokenProvider.accessTokenGenerate(accountId.toString(), accessTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli());
-        String refreshToken = jwtTokenProvider.refreshTokenGenerate(refreshTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli());
+        String accessToken = jwtTokenProvider.accessTokenGenerate(accountId.toString(), accessTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli(),role);
+        String refreshToken = jwtTokenProvider.refreshTokenGenerate(refreshTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli(),role);
 
         Token findToken = tokenRepository.findByAccountId(accountId)
                 .orElse(null);
