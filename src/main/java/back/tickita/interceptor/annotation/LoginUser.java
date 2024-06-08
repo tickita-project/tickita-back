@@ -1,4 +1,4 @@
-package back.tickita.application.account.annotaion;
+package back.tickita.interceptor.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -40,15 +40,17 @@ public class JwtTokenProvider {
             this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String accessTokenGenerate(String subject, Long expiredAt) {
+    public String accessTokenGenerate(String subject, Long expiredAt, String role) {
         return Jwts.builder()
                 .setSubject(subject)
+                .claim("auth",role)
                 .setExpiration(new Date(expiredAt))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
-    public String refreshTokenGenerate(Long expiredAt) {
+    public String refreshTokenGenerate(Long expiredAt, String role) {
         return Jwts.builder()
+                .claim("auth",role)
                 .setExpiration(new Date(expiredAt))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
@@ -79,7 +81,7 @@ public class JwtTokenProvider {
         if (account == null) {
             return null;
         }
-        LoginUserDetail loginUserDetail = new LoginUserDetail(account.getId(), account.getEmail());
+        LoginUserDetail loginUserDetail = new LoginUserDetail(account.getId(), account.getEmail(), account.getRole().name());
         return new UsernamePasswordAuthenticationToken(loginUserDetail, "",
                 loginUserDetail.getAuthorities());
     }

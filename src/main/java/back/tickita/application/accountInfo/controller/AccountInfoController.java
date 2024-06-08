@@ -27,8 +27,8 @@ public class AccountInfoController {
 
     @PostMapping
     @Operation(summary = "회원 추가 정보 입력", description = "로그인 한 회원의 추가 정보를 등록합니다.")
-    public TokenResponse updateAccountInfo(@RequestBody AccountInfoRequest accountRequest){
-        return infoWriteService.updateAccountInfo(accountRequest);
+    public TokenResponse updateAccountInfo(@RequestBody AccountInfoRequest accountRequest, String role){
+        return infoWriteService.updateAccountInfo(accountRequest, role);
     }
 
     @PostMapping(value = "/img" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

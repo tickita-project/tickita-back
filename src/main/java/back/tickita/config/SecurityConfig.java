@@ -1,9 +1,15 @@
 package back.tickita.config;
 
+import back.tickita.application.account.JwtTokenProvider;
+import back.tickita.filter.LoginFilter;
+import back.tickita.filter.handler.JwtAccessDeninedHandler;
+import back.tickita.security.entrypoint.TokenAuthenticationEntryPoint;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -11,14 +17,21 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
+@EnableGlobalMethodSecurity(securedEnabled = true)
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAccessDeninedHandler jwtAccessDeninedHandler;
+    private final TokenAuthenticationEntryPoint tokenAuthenticationEntryPoint;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -31,12 +44,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .formLogin(Customizer.withDefaults())
+                .addFilterBefore(new LoginFilter(jwtTokenProvider, tokenAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling((exceptionConfig) -> exceptionConfig.authenticationEntryPoint(tokenAuthenticationEntryPoint).accessDeniedHandler(jwtAccessDeninedHandler))
                 .authorizeHttpRequests(authorizeRequest ->
                         authorizeRequest
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/**"),
                                         AntPathRequestMatcher.antMatcher("/login/**")
-                                ).permitAll()
+                                ).permitAll().anyRequest().permitAll()
 
                 )
                 .headers(
