@@ -10,6 +10,7 @@ import back.tickita.application.crews.service.CrewsWriteService;
 import back.tickita.interceptor.annotation.LoginUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class CrewController {
     private final CrewsReadService crewsReadService;
     @PostMapping
     @Operation(summary = "그룹 생성", description = "로그인 한 회원이 원하는 그룹을 생성합니다.")
-    public CrewCreateResponse create(@LoginUser LoginUserInfo loginUserInfo, @RequestBody CrewRequest crewRequest){
+    public CrewCreateResponse create(@LoginUser LoginUserInfo loginUserInfo, @Valid @RequestBody CrewRequest crewRequest){
         return crewsWriteService.create(loginUserInfo.accountId(), crewRequest);
     }
 

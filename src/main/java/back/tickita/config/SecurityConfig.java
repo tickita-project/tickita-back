@@ -50,7 +50,10 @@ public class SecurityConfig {
                         authorizeRequest
                                 .requestMatchers(
                                         AntPathRequestMatcher.antMatcher("/**"),
-                                        AntPathRequestMatcher.antMatcher("/login/**")
+                                        AntPathRequestMatcher.antMatcher("/login/**"),
+                                        AntPathRequestMatcher.antMatcher("v3/api-docs/**"),
+                                        AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
+                                        AntPathRequestMatcher.antMatcher("/swagger-resources/**")
                                 ).permitAll().anyRequest().permitAll()
 
                 )
