@@ -19,10 +19,10 @@ public class ScheduleResponse {
     private String title;
 
     @Schema(description = "시작일시", example = "2024-06-05T09:00:00")
-    private LocalDateTime startTime;
+    private LocalDateTime startDateTime;
 
     @Schema(description = "종료일시", example = "2024-06-05T10:00:00")
-    private LocalDateTime endTime;
+    private LocalDateTime endDateTime;
 
     @Schema(description = "위치", example = "회의실 A")
     private String location;

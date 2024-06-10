@@ -24,9 +24,9 @@ public class Schedule extends BaseEntity {
 
     private String title;
 
-    private LocalDateTime startTime;
+    private LocalDateTime startDateTime;
 
-    private LocalDateTime endTime;
+    private LocalDateTime endDateTime;
 
     private String location;
 
@@ -41,8 +41,8 @@ public class Schedule extends BaseEntity {
 
     public void setSchedule(ScheduleRequest request, Crews crews, List<Participant> participants) {
         this.title = request.getTitle();
-        this.startTime = request.getStartTime();
-        this.endTime = request.getEndTime();
+        this.startDateTime = request.getStartDateTime();
+        this.endDateTime = request.getEndDateTime();
         this.location = request.getLocation();
         this.description = request.getDescription();
         this.crews = crews;
@@ -60,6 +60,6 @@ public class Schedule extends BaseEntity {
                 .map(Participant::getId)
                 .collect(Collectors.toList());
 
-        return new ScheduleResponse(id, title, startTime, endTime, location, description, crews.getId(), participantIds);
+        return new ScheduleResponse(id, title, startDateTime, endDateTime, location, description, crews.getId(), participantIds);
     }
 }

@@ -43,7 +43,7 @@ public class ScheduleService {
 
         List<Long> participantIds = getParticipantIds(schedule);
 
-        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartTime(), schedule.getEndTime(),
+        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
                 schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), participantIds);
     }
 
@@ -66,7 +66,7 @@ public class ScheduleService {
 
         List<Long> participantIds = getParticipantIds(schedule);
 
-        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartTime(), schedule.getEndTime(),
+        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
                 schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), participantIds);
     }
 
@@ -98,7 +98,7 @@ public class ScheduleService {
 
         List<Long> participantIds = getParticipantIds(schedule);
 
-        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartTime(), schedule.getEndTime(),
+        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
                 schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), participantIds);
     }
 
@@ -136,8 +136,8 @@ public class ScheduleService {
     public List<Schedule> filterSchedulesByDate(List<Schedule> schedules, LocalDateTime startDate, LocalDateTime endDate) {
         return schedules.stream()
                 .filter(schedule -> {
-                    LocalDateTime scheduleStartDate = schedule.getStartTime();
-                    LocalDateTime scheduleEndDate = schedule.getEndTime();
+                    LocalDateTime scheduleStartDate = schedule.getStartDateTime();
+                    LocalDateTime scheduleEndDate = schedule.getEndDateTime();
                     return !scheduleEndDate.isBefore(startDate) && !scheduleStartDate.isAfter(endDate);
                 })
                 .collect(Collectors.toList());
@@ -160,7 +160,7 @@ public class ScheduleService {
         List<Long> participantIds = schedule.getParticipants().stream()
                 .map(participant -> participant.getAccount().getId())
                 .collect(Collectors.toList());
-        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartTime(), schedule.getEndTime(),
+        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
                 schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), participantIds);
     }
 }
