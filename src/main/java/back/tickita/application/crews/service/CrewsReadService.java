@@ -28,7 +28,7 @@ public class CrewsReadService {
 
     private final AccountRepository accountRepository;
     private final CrewListRepository crewListRepository;
-
+    private final CrewsRepository crewsRepository;
 
     public CrewInfoResponse getCrewInfo(Long accountId, Long crewId) {
         CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(accountId, crewId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -55,5 +55,9 @@ public class CrewsReadService {
                 .collect(Collectors.toList());
 
         return new CrewAllResponse(crewLists);
+    }
+
+    public Optional<Crews> findById(Long crewId) {
+        return crewsRepository.findById(crewId);
     }
 }
