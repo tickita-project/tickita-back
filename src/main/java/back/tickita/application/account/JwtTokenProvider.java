@@ -60,7 +60,7 @@ public class JwtTokenProvider {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
             return true;
-        } catch (SecurityException | UnsupportedJwtException | IllegalArgumentException e) {
+        } catch (SecurityException | UnsupportedJwtException | IllegalArgumentException | MalformedJwtException e) {
             e.printStackTrace();
         } catch (ExpiredJwtException e) {
             return false;
