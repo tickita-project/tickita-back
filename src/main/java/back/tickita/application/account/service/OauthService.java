@@ -168,8 +168,9 @@ public class OauthService {
             kakaoUser = new Account();
             kakaoUser.setUserInfo(kakaoEmail,KAKAO);
             kakaoUser.setIsComplete(false);
-            accountRepository.save(kakaoUser);
-        } if (!kakaoUser.isComplete()){
+            kakaoUser = accountRepository.save(kakaoUser);
+        }
+        if (!kakaoUser.isComplete()){
             return new TokenResponse(kakaoUser.getId(), null, null, null, null, null, false,
                     kakaoUser.getEmail(), null, null, null);
         }

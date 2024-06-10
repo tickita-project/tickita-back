@@ -42,8 +42,8 @@ public class InfoWriteService {
     public String accountWithdrawal(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
         Token token = tokenRepository.findByAccountId(accountId).orElse(null);
-        accountRepository.delete(account);
         tokenRepository.delete(token);
+        accountRepository.delete(account);
         return "회원 탈퇴 성공";
     }
 }

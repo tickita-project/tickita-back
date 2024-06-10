@@ -37,7 +37,7 @@ public class AuthTokensGenerator {
 
         Token findToken = tokenRepository.findByAccountId(accountId)
                 .orElse(null);
-        Account account = accountRepository.findById(accountId).orElse(null);
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
         if (findToken == null) {
             saveToken(accountId, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt);
             return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt, isComplete, account.getEmail(), account.getImage(), account.getNickName(), account.getPhoneNumber());
