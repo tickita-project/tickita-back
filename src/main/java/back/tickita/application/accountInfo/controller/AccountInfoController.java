@@ -1,12 +1,14 @@
 package back.tickita.application.accountInfo.controller;
 
 
+import back.tickita.application.account.dto.request.LoginUserInfo;
 import back.tickita.application.accountInfo.dto.request.AccountInfoRequest;
 import back.tickita.application.accountInfo.dto.response.AccountImgUrlResponse;
 import back.tickita.application.accountInfo.dto.response.AccountInfoResponse;
 import back.tickita.application.accountInfo.dto.response.AccountResponse;
 import back.tickita.application.accountInfo.service.InfoReadService;
 import back.tickita.application.accountInfo.service.InfoWriteService;
+import back.tickita.interceptor.annotation.LoginUser;
 import back.tickita.security.response.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,5 +49,11 @@ public class AccountInfoController {
     @Operation(summary = "회원 이메일 조회", description = "로그인 한 회원의 이메일을 조회합니다.")
     public AccountResponse findAccountEmail(@PathVariable(value = "accountId") Long accountId){
         return infoReadService.findAccountEmail(accountId);
+    }
+
+    @DeleteMapping
+    @Operation(summary = "회원 탈퇴", description = "해당 토큰을 가진 회원을 탈퇴합니다.")
+    public String accountWithdrawal(@LoginUser LoginUserInfo loginUserInfo) {
+        return infoWriteService.accountWithdrawal(loginUserInfo.accountId());
     }
 }
