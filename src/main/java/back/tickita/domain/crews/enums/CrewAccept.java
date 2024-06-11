@@ -1,10 +1,10 @@
 package back.tickita.domain.crews.enums;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum CrewAccept {
     ACCEPT, DECLINE, WAIT
 }
