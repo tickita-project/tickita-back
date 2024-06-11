@@ -2,11 +2,11 @@ package back.tickita.application.schedule.service;
 
 import back.tickita.application.crews.service.CrewsReadService;
 import back.tickita.application.schedule.dto.request.ScheduleRequest;
-import back.tickita.application.schedule.dto.response.FilteredScheduleResponse;
 import back.tickita.application.schedule.dto.response.MessageResponse;
 import back.tickita.application.schedule.dto.response.ScheduleResponse;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
+import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
 import back.tickita.domain.schedule.entity.Participant;
 import back.tickita.domain.schedule.entity.Schedule;
@@ -16,6 +16,7 @@ import back.tickita.exception.ErrorCode;
 import back.tickita.exception.TickitaException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -25,51 +26,55 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ScheduleService {
 
-    private ScheduleRepository scheduleRepository;
-    private CrewsReadService crewsReadService;
-    private ParticipantRepository participantRepository;
-    private AccountRepository accountRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final CrewsReadService crewsReadService;
+    private final ParticipantRepository participantRepository;
+    private final AccountRepository accountRepository;
 
+    @Transactional
     public ScheduleResponse createSchedule(ScheduleRequest request) {
         Crews crews = crewsReadService.findById(request.getCrewId())
                 .orElseThrow(() -> new IllegalArgumentException("Crew not found"));
 
-        // 요청된 participantId와 일치하는 accountId를 가진 Participant 객체를 생성
-        List<Participant> participants = convertToParticipants(request.getParticipantIds(), crews);
+        // 요청된 participants와 일치하는 Participant 객체를 생성
+        List<Participant> participants = convertToParticipants(request.getParticipants(), crews);
 
         Schedule schedule = new Schedule();
         schedule.setSchedule(request, crews, participants);
         scheduleRepository.save(schedule);
 
-        List<Long> participantIds = getParticipantIds(schedule);
-
-        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
-                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), participantIds);
+        return convertToScheduleResponse(schedule);
     }
 
-    private List<Participant> convertToParticipants(List<Long> participantIds, Crews crews) {
-        return crews.getCrewLists().stream()
-                .filter(participantInfo -> participantIds.contains(participantInfo.getAccount().getId()))
-                .map(participantInfo -> new Participant(participantInfo.getAccount()))
-                .collect(Collectors.toList());
+    private List<Participant> convertToParticipants(List<ScheduleRequest.ParticipantInfo> participantInfos, Crews crews) {
+        Set<Long> crewMemberIds = crews.getCrewLists().stream()
+                .map(crewMember -> crewMember.getAccount().getId())
+                .collect(Collectors.toSet());
+
+        List<Participant> participants = new ArrayList<>();
+        for (ScheduleRequest.ParticipantInfo participantInfo : participantInfos) {
+            if (!crewMemberIds.contains(participantInfo.getAccountId())) {
+                throw new IllegalArgumentException("Participant with ID " + participantInfo.getAccountId() + " does not belong to the specified crew.");
+            }
+            Account foundAccount  = crews.getCrewLists().stream()
+                    .map(CrewList::getAccount)
+                    .filter(account -> account.getId().equals(participantInfo.getAccountId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Account with ID " + participantInfo.getAccountId() + " not found in crew."));
+            participants.add(new Participant(foundAccount));
+        }
+        return participants;
     }
 
-    private List<Long> getParticipantIds(Schedule schedule) {
-        return schedule.getParticipants().stream()
-                .map(participant -> participant.getAccount().getId())
-                .collect(Collectors.toList());
-    }
-
+    @Transactional(readOnly = true)
     public ScheduleResponse getScheduleById(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new NoSuchElementException("Schedule not found"));
 
-        List<Long> participantIds = getParticipantIds(schedule);
-
-        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
-                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), participantIds);
+        return convertToScheduleResponse(schedule);
     }
 
+    @Transactional
     public ScheduleResponse updateSchedule(Long accountId, Long scheduleId, ScheduleRequest request) {
 
         Account updater = accountRepository.findById(accountId)
@@ -85,23 +90,16 @@ public class ScheduleService {
         Crews crews = crewsReadService.findById(request.getCrewId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid group ID"));
 
-        // 요청된 participantId와 일치하는 accountId를 가진 Participant 객체를 생성
-        List<Participant> participants = crews.getCrewLists().stream()
-                .filter(participantInfo -> request.getParticipantIds().contains(participantInfo.getAccount().getId()))
-                .map(participantInfo -> {
-                    return new Participant(participantInfo.getAccount(), schedule);
-                })
-                .collect(Collectors.toList());
+        // 요청된 participants와 일치하는 Participant 객체를 생성
+        List<Participant> participants = convertToParticipants(request.getParticipants(), crews);
 
         schedule.setSchedule(request, crews, participants);
         scheduleRepository.save(schedule);
 
-        List<Long> participantIds = getParticipantIds(schedule);
-
-        return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
-                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), participantIds);
+        return convertToScheduleResponse(schedule);
     }
 
+    @Transactional
     public MessageResponse deleteSchedule(Long accountId, Long scheduleId) {
 
         Account deleter = accountRepository.findById(accountId)
@@ -115,21 +113,18 @@ public class ScheduleService {
         }
         scheduleRepository.delete(schedule);
 
-        return new MessageResponse(scheduleId,"일정이 성공적으로 삭제되었습니다.");
+        return new MessageResponse(scheduleId, "일정이 성공적으로 삭제되었습니다.");
     }
 
-    public List<FilteredScheduleResponse> getFilteredSchedules(Long accountId, List<Long> crewIds, LocalDateTime startDate, LocalDateTime endDate) {
+    @Transactional(readOnly = true)
+    public List<ScheduleResponse> getFilteredSchedules(Long accountId, Long crewId, LocalDateTime startDate, LocalDateTime endDate) {
         // 그룹 ID와 사용자 ID로 필터링
-        List<Schedule> schedules = participantRepository.findSchedulesByCrewIdsAndParticipantId(crewIds, accountId);
-
+        List<Schedule> schedules = participantRepository.findSchedulesByCrewIdAndParticipantId(crewId, accountId);
         // 기간 필터링
         List<Schedule> filteredSchedules = filterSchedulesByDate(schedules, startDate, endDate);
 
-        // 일정을 그룹 ID로 그룹화
-        Map<Long, List<ScheduleResponse>> groupedSchedules = groupSchedulesByCrewId(filteredSchedules);
-
-        return groupedSchedules.entrySet().stream()
-                .map(entry -> new FilteredScheduleResponse(entry.getKey(), entry.getValue()))
+        return filteredSchedules.stream()
+                .map(this::convertToScheduleResponse)
                 .collect(Collectors.toList());
     }
 
@@ -143,24 +138,14 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
-    private Map<Long, List<ScheduleResponse>> groupSchedulesByCrewId(List<Schedule> schedules) {
-        Map<Long, List<ScheduleResponse>> groupedSchedules = new HashMap<>();
-
-        // 일정을 그룹 ID로 그룹화
-        for (Schedule schedule : schedules) {
-            Long crewId = schedule.getCrews().getId();
-            List<ScheduleResponse> groupSchedules = groupedSchedules.getOrDefault(crewId, new ArrayList<>());
-            groupSchedules.add(convertToScheduleResponse(schedule));
-            groupedSchedules.put(crewId, groupSchedules);
-        }
-        return groupedSchedules;
-    }
-
     private ScheduleResponse convertToScheduleResponse(Schedule schedule) {
-        List<Long> participantIds = schedule.getParticipants().stream()
-                .map(participant -> participant.getAccount().getId())
+        List<ScheduleResponse.ParticipantInfo> participantInfos = schedule.getParticipants().stream()
+                .map(participant -> new ScheduleResponse.ParticipantInfo(
+                        participant.getAccount().getId(),
+                        participant.getAccount().getNickName()))
                 .collect(Collectors.toList());
+
         return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
-                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), participantIds);
+                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), schedule.getCrews().getCrewName(), schedule.getCrews().getLabelColor(), participantInfos);
     }
 }

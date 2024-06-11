@@ -31,6 +31,12 @@ public class ScheduleRequest {
     @Schema(description = "그룹ID", example = "1")
     private Long crewId;
 
-    @Schema(description = "참석자", example = "[1, 2]")
-    private List<Long> participantIds;
+    @Schema(description = "참석자", example = "[{\"accountId\": 1, \"nickName\": \"User1\"}, {\"accountId\": 2, \"nickName\": \"User2\"}]")
+    private List<ParticipantInfo> participants;
+
+    @Getter
+    public static class ParticipantInfo {
+        private Long accountId;
+        private String nickName;
+    }
 }

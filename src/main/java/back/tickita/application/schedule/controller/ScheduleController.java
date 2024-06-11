@@ -2,7 +2,6 @@ package back.tickita.application.schedule.controller;
 
 import back.tickita.application.account.dto.request.LoginUserInfo;
 import back.tickita.application.schedule.dto.request.ScheduleRequest;
-import back.tickita.application.schedule.dto.response.FilteredScheduleResponse;
 import back.tickita.application.schedule.dto.response.MessageResponse;
 import back.tickita.application.schedule.dto.response.ScheduleResponse;
 import back.tickita.application.schedule.service.ScheduleService;
@@ -58,10 +57,10 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.deleteSchedule(loginUserInfo.accountId(), scheduleId));
     }
 
-    @GetMapping("/filter")
+    @GetMapping("filter/{crewId}")
     @Operation(summary = "일정 조회", description = "선택한 그룹, 기간의 일정 중 사용자가 참석자로 포함된 일정을 조회합니다.")
-    public ResponseEntity<List<FilteredScheduleResponse>> getFilteredSchedules(@LoginUser LoginUserInfo loginUserInfo, @RequestParam List<Long> crewIds,
+    public ResponseEntity<List<ScheduleResponse>> getFilteredSchedules(@LoginUser LoginUserInfo loginUserInfo, @PathVariable Long crewId,
                                                                                @RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
-        return ResponseEntity.ok(scheduleService.getFilteredSchedules(loginUserInfo.accountId(), crewIds, startDate, endDate));
+        return ResponseEntity.ok(scheduleService.getFilteredSchedules(loginUserInfo.accountId(), crewId, startDate, endDate));
     }
 }

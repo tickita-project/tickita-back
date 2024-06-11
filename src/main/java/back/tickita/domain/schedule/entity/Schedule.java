@@ -36,7 +36,7 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "crews_id")
     private Crews crews;
 
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participant> participants = new ArrayList<>();
 
     public void setSchedule(ScheduleRequest request, Crews crews, List<Participant> participants) {
@@ -47,19 +47,11 @@ public class Schedule extends BaseEntity {
         this.description = request.getDescription();
         this.crews = crews;
         this.participants.clear();
+        this.participants.addAll(participants);
 
         // 각 Participant에 Schedule 설정
         for (Participant participant : participants) {
             participant.setSchedule(this);
-            this.participants.add(participant);
         }
-    }
-
-    public ScheduleResponse toScheduleResponse() {
-        List<Long> participantIds = participants.stream()
-                .map(Participant::getId)
-                .collect(Collectors.toList());
-
-        return new ScheduleResponse(id, title, startDateTime, endDateTime, location, description, crews.getId(), participantIds);
     }
 }
