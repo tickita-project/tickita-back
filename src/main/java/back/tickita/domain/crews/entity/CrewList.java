@@ -27,4 +27,8 @@ public class CrewList extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private CrewAccept crewAccept;
+
+    public void setCrewAccept(CrewAccept crewAccept) {
+        this.crewAccept = crewAccept;
+    }
 }

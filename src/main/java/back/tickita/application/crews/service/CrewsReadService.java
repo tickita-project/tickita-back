@@ -9,6 +9,7 @@ import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
+import back.tickita.domain.crews.enums.CrewRole;
 import back.tickita.domain.crews.repository.CrewListRepository;
 import back.tickita.domain.crews.repository.CrewsRepository;
 import back.tickita.exception.ErrorCode;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,7 +40,8 @@ public class CrewsReadService {
         List<CrewMemberInfoResponse> crewMemberInfos = crews.getCrewLists()
                 .stream()
                 .map(crewInfoList -> new CrewMemberInfoResponse(
-                        crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewList.getAccount().getEmail(), crewInfoList.getCrewRole().name()))
+                        crewInfoList.getCrewRole().name(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail()))
+                .sorted(Comparator.comparingInt(crewInfo -> CrewRole.valueOf(crewInfo.getRole()).getOrder()))
                 .collect(Collectors.toList());
 
         return new CrewInfoResponse(crews.getCrewName(), crews.getLabelColor(), crews.getId(), crewMemberInfos);
