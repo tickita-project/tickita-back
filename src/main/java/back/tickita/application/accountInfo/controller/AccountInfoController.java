@@ -11,6 +11,7 @@ import back.tickita.application.accountInfo.service.InfoWriteService;
 import back.tickita.interceptor.annotation.LoginUser;
 import back.tickita.security.response.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ public class AccountInfoController {
 
     @PostMapping
     @Operation(summary = "회원 추가 정보 입력", description = "로그인 한 회원의 추가 정보를 등록합니다.")
-    public TokenResponse updateAccountInfo(@RequestBody AccountInfoRequest accountRequest, String role){
+    public TokenResponse updateAccountInfo(@RequestBody AccountInfoRequest accountRequest, @Parameter(hidden = true) String role){
         return infoWriteService.updateAccountInfo(accountRequest, role);
     }
 
@@ -39,10 +40,10 @@ public class AccountInfoController {
         return infoWriteService.updateAccountImg(multipartFile);
     }
 
-    @GetMapping("/all/{accountId}")
+    @GetMapping("/all")
     @Operation(summary = "회원 추가 정보 조회", description = "로그인 한 회원의 정보를 조회합니다.")
-    public AccountInfoResponse findAccountInfo(@PathVariable(value = "accountId") Long accountId){
-        return infoReadService.findAccountInfo(accountId);
+    public AccountInfoResponse findAccountInfo(@LoginUser LoginUserInfo loginUserInfo){
+        return infoReadService.findAccountInfo(loginUserInfo.accountId());
     }
 
     @GetMapping("/{accountId}")

@@ -21,7 +21,7 @@ public class NotificationController {
     private final NotificationReadService NotificationReadService;
     private final NotificationWriteService notificationWriteService;
 
-    @GetMapping("/{crewId}")
+    @GetMapping
     @Operation(summary = "전체 알림 조회", description = "로그인 한 회원의 전체 알림을 조회합니다.")
     public NotificationResponse getInvite(@LoginUser LoginUserInfo loginUserInfo){
         return NotificationReadService.findAllNotification(loginUserInfo.accountId());
