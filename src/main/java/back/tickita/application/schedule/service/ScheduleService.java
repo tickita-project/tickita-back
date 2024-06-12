@@ -1,6 +1,5 @@
 package back.tickita.application.schedule.service;
 
-import back.tickita.application.crews.service.CrewsReadService;
 import back.tickita.application.schedule.dto.request.ScheduleRequest;
 import back.tickita.application.schedule.dto.response.MessageResponse;
 import back.tickita.application.schedule.dto.response.ScheduleResponse;
@@ -8,6 +7,7 @@ import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
+import back.tickita.domain.crews.repository.CrewsRepository;
 import back.tickita.domain.schedule.entity.Participant;
 import back.tickita.domain.schedule.entity.Schedule;
 import back.tickita.domain.schedule.repository.ParticipantRepository;
@@ -27,13 +27,13 @@ import java.util.stream.Collectors;
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
-    private final CrewsReadService crewsReadService;
+    private final CrewsRepository crewsRepository;
     private final ParticipantRepository participantRepository;
     private final AccountRepository accountRepository;
 
     @Transactional
     public ScheduleResponse createSchedule(ScheduleRequest request) {
-        Crews crews = crewsReadService.findById(request.getCrewId())
+        Crews crews = crewsRepository.findById(request.getCrewId())
                 .orElseThrow(() -> new IllegalArgumentException("Crew not found"));
 
         // 요청된 participants와 일치하는 Participant 객체를 생성
@@ -87,7 +87,7 @@ public class ScheduleService {
             throw new SecurityException("해당 일정을 변경할 권한이 없습니다.");
         }
 
-        Crews crews = crewsReadService.findById(request.getCrewId())
+        Crews crews = crewsRepository.findById(request.getCrewId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid group ID"));
 
         // 요청된 participants와 일치하는 Participant 객체를 생성
