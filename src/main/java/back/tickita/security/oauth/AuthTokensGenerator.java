@@ -25,7 +25,7 @@ public class AuthTokensGenerator {
 
     private static final String GRANT_TYPE = "Bearer";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 300;
-    private static final  long REFRESH_TOKEN_EXPIRE_TIME = 3600;
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 604800;
 
     //id 받아 Access Token 생성
     public TokenResponse generate(Long accountId, LocalDateTime now, boolean isComplete, String role) {
