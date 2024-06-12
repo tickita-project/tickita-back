@@ -31,9 +31,7 @@ public class ScheduleController {
     @PostMapping
     @Operation(summary = "일정 등록", description = "일정을 등록합니다.")
     public ResponseEntity<ScheduleResponse> createSchedule(@LoginUser LoginUserInfo loginUserInfo, @RequestBody ScheduleRequest request) {
-        Account account = accountRepository.findById(loginUserInfo.accountId())
-                .orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-        return ResponseEntity.ok(scheduleService.createSchedule(request));
+        return ResponseEntity.ok(scheduleService.createSchedule(loginUserInfo.accountId(), request));
     }
 
     @GetMapping("/{scheduleId}")

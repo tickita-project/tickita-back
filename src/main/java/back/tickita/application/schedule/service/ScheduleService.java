@@ -7,6 +7,7 @@ import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
+import back.tickita.domain.crews.repository.CrewListRepository;
 import back.tickita.domain.crews.repository.CrewsRepository;
 import back.tickita.domain.schedule.entity.Participant;
 import back.tickita.domain.schedule.entity.Schedule;
@@ -28,13 +29,18 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final CrewsRepository crewsRepository;
+    private final CrewListRepository crewListRepository;
     private final ParticipantRepository participantRepository;
     private final AccountRepository accountRepository;
 
     @Transactional
-    public ScheduleResponse createSchedule(ScheduleRequest request) {
+    public ScheduleResponse createSchedule(Long accountId, ScheduleRequest request) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
+        CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(accountId, request.getCrewId())
+                .orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
         Crews crews = crewsRepository.findById(request.getCrewId())
-                .orElseThrow(() -> new IllegalArgumentException("Crew not found"));
+                .orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
 
         // 요청된 participants와 일치하는 Participant 객체를 생성
         List<Participant> participants = convertToParticipants(request.getParticipants(), crews);
