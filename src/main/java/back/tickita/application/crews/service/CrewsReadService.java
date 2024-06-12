@@ -59,8 +59,4 @@ public class CrewsReadService {
 
         return new CrewAllResponse(crewLists);
     }
-
-    public Optional<Crews> findById(Long crewId) {
-        return crewsRepository.findById(crewId);
-    }
 }
