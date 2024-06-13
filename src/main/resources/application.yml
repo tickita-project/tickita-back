@@ -66,5 +66,6 @@ cloud:
 
   servlet:
     multipart:
-      maxFileSize: 5MB
-      maxRequestSize: 10MB
+      max-file-size: 5MB
+      max-request-size: 10MB
+      resolve-lazily: true
