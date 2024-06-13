@@ -91,17 +91,13 @@ public class OauthService {
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
         RestTemplate rt = new RestTemplate();
-        ResponseEntity<String> response;
-        try {
-            response = rt.exchange(
-                    KAKAO_TOKEN_URI,
-                    HttpMethod.POST,
-                    kakaoTokenRequest,
-                    String.class
-            );
-        }catch (Exception e){
-            throw new TickitaException(ErrorCode.INVALID_AUTH_CODE);
-        }
+        ResponseEntity<String> response =  rt.exchange(
+                KAKAO_TOKEN_URI,
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                String.class
+        );;
+
 
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         String responseBody = response.getBody();
