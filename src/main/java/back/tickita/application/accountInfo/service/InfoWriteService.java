@@ -32,10 +32,6 @@ public class InfoWriteService {
     private final AccountRepository accountRepository;
     private final ImageUploadService imageUploadService;
     private final AuthTokensGenerator authTokensGenerator;
-    private final TokenRepository tokenRepository;
-    private final CrewListRepository crewListRepository;
-    private final NotificationRepository notificationRepository;
-    private final CrewNotificationRepository crewNotificationRepository;
 
     public TokenResponse updateAccountInfo(AccountInfoRequest accountRequest, String role){
         Account account = accountRepository.findById(accountRequest.getAccountId()).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -50,12 +46,6 @@ public class InfoWriteService {
 
     public String accountWithdrawal(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-        Token token = tokenRepository.findByAccountId(accountId).orElse(null);
-        CrewList crewList = crewListRepository.findByAccount_Id(account.getId()).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
-        CrewNotification crewNotification = crewNotificationRepository.findByCrewList_Account_Id(account.getId()).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
-        tokenRepository.delete(token);
-        crewListRepository.delete(crewList);
-        crewNotificationRepository.delete(crewNotification);
         accountRepository.delete(account);
         return "회원 탈퇴 성공";
     }
