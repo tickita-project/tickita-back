@@ -1,6 +1,7 @@
 package back.tickita.application.account.service;
 
 import back.tickita.domain.account.entity.Account;
+import back.tickita.domain.account.entity.enums.Role;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.token.entity.Token;
 import back.tickita.domain.token.repository.TokenRepository;
@@ -29,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import static back.tickita.domain.account.enums.SocialType.KAKAO;
+import static back.tickita.exception.ErrorCode.TOKEN_NOT_FOUND;
 
 
 @Service
@@ -55,9 +57,9 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
 
-    public TokenResponse refresh(String refreshToken, String role) {
-        Token token = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new NotFoundException("리프레쉬 토큰이 존재하지않음"));
-        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false, role);
+    public TokenResponse refresh(String refresh) {
+        Token token = tokenRepository.findByRefresh(refresh).orElseThrow(() -> new TickitaException(TOKEN_NOT_FOUND));
+        return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false, Role.USER.name());
     }
 
     @Transactional(noRollbackFor = TickitaException.class)

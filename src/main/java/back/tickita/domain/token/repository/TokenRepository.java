@@ -17,6 +17,6 @@ public interface TokenRepository extends JpaRepository<Token,Long> {
     @Query("SELECT t FROM Token t JOIN FETCH t.account WHERE t.access = :access")
     Optional<Token> findTokenLoginInfo(@Param("access") String access);
 
-    @Query("SELECT t FROM Token t JOIN FETCH t.account WHERE t.refresh = :refreshToken")
-    Optional<Token> findByRefreshToken(@Param("refreshToken") String refreshToken);
+    @Query("SELECT t FROM Token t JOIN FETCH t.account WHERE t.refresh = :refresh")
+    Optional<Token> findByRefresh(@Param("refresh") String refresh);
 }
