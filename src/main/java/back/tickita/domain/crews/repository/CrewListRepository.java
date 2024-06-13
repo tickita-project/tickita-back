@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface CrewListRepository extends JpaRepository<CrewList, Long> {
-    List<CrewList> findByAccountId(Long accountId);
+    List<CrewList> findAllByAccountId(Long accountId);
     Optional<CrewList> findByAccount_Id(Long accountId);
     Optional<CrewList> findByAccountIdAndCrewsId(Long accountId, Long crewId);
     Optional<CrewList> findByAccountAndCrews(Account account, Crews crews);

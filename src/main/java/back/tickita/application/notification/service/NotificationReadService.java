@@ -32,7 +32,7 @@ public class NotificationReadService {
 
     public NotificationResponse findAllNotification(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-        List<CrewList> crewList = crewListRepository.findByAccountId(account.getId());
+        List<CrewList> crewList = crewListRepository.findAllByAccountId(account.getId());
         List<CrewNotification> crewNotifications = crewNotificationRepository.findAllByCrewListInAndNotification_NotificationType(crewList, NotificationType.INVITE)
                 .stream()
                 .filter(crewNotification -> crewNotification.getCrewList().getCrewAccept() == CrewAccept.WAIT)

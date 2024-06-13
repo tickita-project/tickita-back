@@ -2,13 +2,13 @@ package back.tickita.domain.notification.entity;
 
 import back.tickita.common.BaseEntity;
 import back.tickita.domain.notification.eums.NotificationType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,6 +20,9 @@ public class Notification extends BaseEntity {
     private NotificationType notificationType;
 
     private Boolean isChecked = false;
+
+    @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CrewNotification> crewNotifications;
 
     public Notification(NotificationType notificationType) {
         this.notificationType = notificationType;

@@ -30,7 +30,6 @@ public class CrewsReadService {
 
     private final AccountRepository accountRepository;
     private final CrewListRepository crewListRepository;
-    private final CrewsRepository crewsRepository;
 
     public CrewInfoResponse getCrewInfo(Long accountId, Long crewId) {
         CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(accountId, crewId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -49,7 +48,7 @@ public class CrewsReadService {
 
     public CrewAllResponse getCrewAll(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-        List<CrewList> crewList = crewListRepository.findByAccountId(account.getId());
+        List<CrewList> crewList = crewListRepository.findAllByAccountId(account.getId());
 
         List<CrewAllInfo> crewLists = crewList
                 .stream()

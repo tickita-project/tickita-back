@@ -3,14 +3,15 @@ package back.tickita.domain.account.entity;
 import back.tickita.common.BaseEntity;
 import back.tickita.domain.account.entity.enums.Role;
 import back.tickita.domain.account.enums.SocialType;
+import back.tickita.domain.crews.entity.CrewList;
+import back.tickita.domain.token.entity.Token;
 import io.jsonwebtoken.Jwts;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,6 +35,12 @@ public class Account extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    private List<CrewList> crewList;
+
+    @OneToOne(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Token token;
 
     public void setUserInfo(String email, SocialType socialType) {
         this.email = email;

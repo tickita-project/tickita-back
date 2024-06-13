@@ -5,10 +5,13 @@ import back.tickita.common.BaseEntity;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.crews.enums.CrewAccept;
 import back.tickita.domain.crews.enums.CrewRole;
+import back.tickita.domain.notification.entity.CrewNotification;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +30,16 @@ public class CrewList extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private CrewAccept crewAccept;
+
+    @OneToMany(mappedBy = "crewList", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CrewNotification> crewNotifications;
+
+    public CrewList(Crews crews, Account account, CrewRole crewRole, CrewAccept crewAccept) {
+        this.crews = crews;
+        this.account = account;
+        this.crewRole = crewRole;
+        this.crewAccept = crewAccept;
+    }
 
     public void setCrewAccept(CrewAccept crewAccept) {
         this.crewAccept = crewAccept;
