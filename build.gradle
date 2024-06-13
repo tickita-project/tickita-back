@@ -49,4 +49,6 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 }
