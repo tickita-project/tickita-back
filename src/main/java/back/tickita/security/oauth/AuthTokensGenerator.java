@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
@@ -29,11 +30,15 @@ public class AuthTokensGenerator {
 
     //id 받아 Access Token 생성
     public TokenResponse generate(Long accountId, LocalDateTime now, boolean isComplete, String role) {
-        LocalDateTime accessTokenExpiredAt = now.plus(ACCESS_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
-        LocalDateTime refreshTokenExpiredAt =  now.plus(REFRESH_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
+        ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
+        LocalDateTime koreaNow = now.atZone(ZoneId.systemDefault()).withZoneSameInstant(koreaZoneId).toLocalDateTime();
+        ZoneOffset koreaZoneOffset = koreaZoneId.getRules().getOffset(koreaNow);
 
-        String accessToken = jwtTokenProvider.accessTokenGenerate(accountId.toString(), accessTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli(),role);
-        String refreshToken = jwtTokenProvider.refreshTokenGenerate(refreshTokenExpiredAt.toInstant(ZoneOffset.UTC).toEpochMilli(),role);
+        LocalDateTime accessTokenExpiredAt = koreaNow.plus(ACCESS_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
+        LocalDateTime refreshTokenExpiredAt =  koreaNow.plus(REFRESH_TOKEN_EXPIRE_TIME, ChronoUnit.SECONDS);
+
+        String accessToken = jwtTokenProvider.accessTokenGenerate(accountId.toString(), accessTokenExpiredAt.toInstant(koreaZoneOffset).toEpochMilli(),role);
+        String refreshToken = jwtTokenProvider.refreshTokenGenerate(refreshTokenExpiredAt.toInstant(koreaZoneOffset).toEpochMilli(),role);
 
         Token findToken = tokenRepository.findByAccountId(accountId)
                 .orElse(null);
