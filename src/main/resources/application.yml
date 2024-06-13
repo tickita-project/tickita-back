@@ -63,7 +63,8 @@ cloud:
       access-key: ${AWS_S3_ACCESS_KEY}
       secret-key: ${AWS_S3_SECRET_KEY}
 
+
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 10MB
+      maxFileSize: 5MB
+      maxRequestSize: 10MB
