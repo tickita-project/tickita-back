@@ -47,7 +47,7 @@ public class AuthTokensGenerator {
             saveToken(accountId, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt);
             return new TokenResponse(accountId, GRANT_TYPE, accessToken, accessTokenExpiredAt, refreshToken, refreshTokenExpiredAt, isComplete, account.getEmail(), account.getImage(), account.getNickName(), account.getPhoneNumber());
         }
-            updateTokenProcess(now, findToken, accessToken, accessTokenExpiredAt, refreshToken,
+            updateTokenProcess(koreaNow, findToken, accessToken, accessTokenExpiredAt, refreshToken,
                     refreshTokenExpiredAt);
 
             return new TokenResponse(accountId, GRANT_TYPE, findToken.getAccess(), findToken.getAccessExpiredAt(), findToken.getRefresh(), findToken.getRefreshExpiredAt(), isComplete, account.getEmail(), account.getImage(), account.getNickName(), account.getPhoneNumber());
