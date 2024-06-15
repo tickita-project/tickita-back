@@ -87,7 +87,7 @@ public class OauthService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         String requestURL = httpServletRequest.getRequestURL().toString();
-        if (requestURL.contains("http://localhost:3000")){
+        if (requestURL.contains("localhost:3000")){
             KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
         } else {
             KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
