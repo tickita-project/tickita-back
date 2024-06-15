@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.FactoryBean;
@@ -57,6 +58,8 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
 
+    private final HttpServletRequest httpServletRequest;
+
     public TokenResponse refresh(String refresh) {
         Token token = tokenRepository.findByRefresh(refresh).orElseThrow(() -> new TickitaException(TOKEN_NOT_FOUND));
         return authTokensGenerator.generate(token.getAccount().getId(), LocalDateTime.now(), false, Role.USER.name());
@@ -83,6 +86,12 @@ public class OauthService {
 
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        String requestURL = httpServletRequest.getRequestURL().toString();
+        if (requestURL.contains("http://localhost:3000")){
+            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
+        } else {
+            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
+        }
         body.add("grant_type", "authorization_code");
         body.add("client_id", KAKAO_CLIENT_ID);
         body.add("redirect_uri", KAKAO_REDIRECT_URI);
