@@ -49,7 +49,7 @@ public class ScheduleService {
         schedule.setSchedule(request, crews, participants);
         scheduleRepository.save(schedule);
 
-        return convertToScheduleResponse(schedule);
+        return convertToScheduleResponse(schedule, accountId);
     }
 
     private List<Participant> convertToParticipants(List<ScheduleRequest.ParticipantInfo> participantInfos, Crews crews) {
@@ -73,11 +73,11 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public ScheduleResponse getScheduleById(Long scheduleId) {
+    public ScheduleResponse getScheduleById(Long scheduleId, Long accountId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new NoSuchElementException("Schedule not found"));
 
-        return convertToScheduleResponse(schedule);
+        return convertToScheduleResponse(schedule, accountId);
     }
 
     @Transactional
@@ -102,7 +102,7 @@ public class ScheduleService {
         schedule.setSchedule(request, crews, participants);
         scheduleRepository.save(schedule);
 
-        return convertToScheduleResponse(schedule);
+        return convertToScheduleResponse(schedule, accountId);
     }
 
     @Transactional
@@ -130,7 +130,7 @@ public class ScheduleService {
         List<Schedule> filteredSchedules = filterSchedulesByDate(schedules, startDate, endDate);
 
         return filteredSchedules.stream()
-                .map(this::convertToScheduleResponse)
+                .map(schedule -> convertToScheduleResponse(schedule, accountId))
                 .collect(Collectors.toList());
     }
 
@@ -144,14 +144,23 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
-    private ScheduleResponse convertToScheduleResponse(Schedule schedule) {
+    private ScheduleResponse convertToScheduleResponse(Schedule schedule, Long accountId) {
         List<ScheduleResponse.ParticipantInfo> participantInfos = schedule.getParticipants().stream()
                 .map(participant -> new ScheduleResponse.ParticipantInfo(
                         participant.getAccount().getId(),
                         participant.getAccount().getNickName()))
                 .collect(Collectors.toList());
 
+        // Crews에서 individualColor 가져오기
+        Map<Long, String> individualColors = schedule.getCrews().getCrewLists().stream()
+                .collect(Collectors.toMap(
+                        crewList -> crewList.getAccount().getId(),
+                        CrewList::getIndividualColor
+                ));
+
+        String individualColor = individualColors.getOrDefault(accountId, schedule.getCrews().getLabelColor());
+
         return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
-                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), schedule.getCrews().getCrewName(), schedule.getCrews().getLabelColor(), participantInfos);
+                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), schedule.getCrews().getCrewName(), individualColor, participantInfos);
     }
 }
