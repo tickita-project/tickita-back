@@ -64,10 +64,10 @@ public class CrewController {
         return ResponseEntity.ok(crewsWriteService.leaveCrew(crewId, loginUserInfo.accountId()));
     }
 
-    @DeleteMapping("remove-member/{crewId}")
+    @DeleteMapping("remove-member/{crewId}/{memberId}")
     @Operation(summary = "그룹 내보내기", description = "그룹장이 멤버를 탈퇴시킵니다.")
     public ResponseEntity<CrewMessageResponse> removeMember(@LoginUser LoginUserInfo loginUserInfo, @PathVariable(value = "crewId") Long crewId,
-                                                            @RequestParam(value = "memberId") Long memberId) {
+                                                            @PathVariable(value = "memberId") Long memberId) {
         return ResponseEntity.ok(crewsWriteService.removeMember(crewId, loginUserInfo.accountId(), memberId));
     }
 
