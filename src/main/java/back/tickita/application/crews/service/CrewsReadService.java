@@ -1,14 +1,12 @@
 package back.tickita.application.crews.service;
 
 
-import back.tickita.application.crews.dto.response.CrewAllInfo;
-import back.tickita.application.crews.dto.response.CrewAllResponse;
-import back.tickita.application.crews.dto.response.CrewInfoResponse;
-import back.tickita.application.crews.dto.response.CrewMemberInfoResponse;
+import back.tickita.application.crews.dto.response.*;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
+import back.tickita.domain.crews.enums.CrewAccept;
 import back.tickita.domain.crews.enums.CrewRole;
 import back.tickita.domain.crews.repository.CrewListRepository;
 import back.tickita.domain.crews.repository.CrewsRepository;
@@ -44,6 +42,28 @@ public class CrewsReadService {
                 .collect(Collectors.toList());
 
         return new CrewInfoResponse(crews.getCrewName(), crews.getLabelColor(), crews.getId(), crewMemberInfos);
+    }
+
+    public CrewDetailResponse getCrewDetails(Long accountId, Long crewId) {
+        CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(1L, crewId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+        Crews crews = crewList.getCrews();
+
+        List<CrewMemberInfoResponse> crewMemberInfos = crews.getCrewLists()
+                .stream()
+                .filter(crewInfoList -> crewInfoList.getCrewAccept() == CrewAccept.ACCEPT)
+                .map(crewInfoList -> new CrewMemberInfoResponse(
+                        crewInfoList.getCrewRole().name(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewList.getAccount().getEmail()))
+                .collect(Collectors.toList());
+
+        List<CrewWaitingMemberInfo> waitMembers = crews.getCrewLists()
+                .stream()
+                .filter(crewInfoList -> crewInfoList.getCrewAccept() == CrewAccept.WAIT)
+                .map(crewInfoList -> new CrewWaitingMemberInfo(
+                        crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail()))
+                .collect(Collectors.toList());
+
+        return new CrewDetailResponse(crews.getCrewName(), crewList.getIndividualColor(), crews.getId(), crewMemberInfos, waitMembers);
     }
 
     public CrewAllResponse getCrewAll(Long accountId) {
