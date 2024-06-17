@@ -27,4 +27,9 @@ public class Crews extends BaseEntity {
         this.crewName = crewName;
         this.labelColor = labelColor;
     }
+
+    public void setCrews(String newCrewName, String newLabelColor) {
+        this.crewName = newCrewName;
+        this.labelColor = newLabelColor;
+    }
 }
