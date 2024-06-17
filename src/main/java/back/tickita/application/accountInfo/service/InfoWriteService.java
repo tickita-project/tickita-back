@@ -2,16 +2,9 @@ package back.tickita.application.accountInfo.service;
 
 import back.tickita.application.accountInfo.dto.request.AccountInfoRequest;
 import back.tickita.application.accountInfo.dto.response.AccountImgUrlResponse;
+import back.tickita.application.accountInfo.dto.response.AccountInfoResponse;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.account.repository.AccountRepository;
-import back.tickita.domain.crews.entity.CrewList;
-import back.tickita.domain.crews.repository.CrewListRepository;
-import back.tickita.domain.notification.entity.CrewNotification;
-import back.tickita.domain.notification.entity.Notification;
-import back.tickita.domain.notification.repository.CrewNotificationRepository;
-import back.tickita.domain.notification.repository.NotificationRepository;
-import back.tickita.domain.token.entity.Token;
-import back.tickita.domain.token.repository.TokenRepository;
 import back.tickita.exception.ErrorCode;
 import back.tickita.exception.TickitaException;
 import back.tickita.security.oauth.AuthTokensGenerator;
@@ -42,6 +35,13 @@ public class InfoWriteService {
 
     public AccountImgUrlResponse updateAccountImg(MultipartFile multipartFile) throws IOException {
         return new AccountImgUrlResponse(imageUploadService.uploadImage(multipartFile));
+    }
+
+    public AccountInfoResponse updateAccountInfo(AccountInfoRequest accountInfoRequest) {
+        Account account = accountRepository.findById(accountInfoRequest.getAccountId()).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
+        account.setAccountInfo(accountInfoRequest.getNickName(), accountInfoRequest.getPhoneNumber(), accountInfoRequest.getImgUrl());
+        accountRepository.save(account);
+        return new AccountInfoResponse(account.getId(), account.getImage(), account.getEmail(), account.getNickName(), account.getPhoneNumber());
     }
 
     public String accountWithdrawal(Long accountId) {
