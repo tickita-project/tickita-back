@@ -25,7 +25,7 @@ public class AuthTokensGenerator {
     private final JwtTokenProvider jwtTokenProvider;
 
     private static final String GRANT_TYPE = "Bearer";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 300;
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 3000;
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 604800;
 
     //id 받아 Access Token 생성

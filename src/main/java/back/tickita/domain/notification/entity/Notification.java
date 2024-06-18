@@ -24,6 +24,10 @@ public class Notification extends BaseEntity {
     @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CrewNotification> crewNotifications;
 
+    @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CoordinationNotification> coordinationNotifications;
+
+
     public Notification(NotificationType notificationType) {
         this.notificationType = notificationType;
     }

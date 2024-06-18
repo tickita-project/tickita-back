@@ -14,5 +14,4 @@ import java.util.Optional;
 @Repository
 public interface CrewNotificationRepository extends JpaRepository<CrewNotification, Long> {
     List<CrewNotification> findAllByCrewListInAndNotification_NotificationType(List<CrewList> crewList, NotificationType notificationType);
-    Optional<CrewNotification> findByCrewList_Account_Id(Long accountId);
 }

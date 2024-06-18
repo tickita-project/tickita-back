@@ -6,6 +6,7 @@ import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.crews.enums.CrewAccept;
 import back.tickita.domain.crews.enums.CrewRole;
 import back.tickita.domain.notification.entity.CrewNotification;
+import back.tickita.domain.vote.entity.VoteList;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,6 +38,9 @@ public class CrewList extends BaseEntity {
     @OneToMany(mappedBy = "crewList", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CrewNotification> crewNotifications;
 
+    @OneToMany(mappedBy = "crewList", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<VoteList> voteList;
+
     public CrewList(Crews crews, Account account, String individualColor, CrewRole crewRole, CrewAccept crewAccept) {
         this.crews = crews;
         this.account = account;
@@ -55,5 +59,9 @@ public class CrewList extends BaseEntity {
 
     public void setIndividualColor(String labelColor) {
         this.individualColor = labelColor;
+    }
+
+    public String getAccountName() {
+        return account != null ? account.getNickName() : null;
     }
 }
