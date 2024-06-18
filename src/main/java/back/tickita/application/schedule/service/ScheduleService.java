@@ -44,9 +44,10 @@ public class ScheduleService {
 
         // 요청된 participants와 일치하는 Participant 객체를 생성
         List<Participant> participants = convertToParticipants(request.getParticipants(), crews);
+        participants.add(new Participant(account));
 
         Schedule schedule = new Schedule();
-        schedule.setSchedule(request, crews, participants);
+        schedule.setSchedule(request, crews, participants, false);
         scheduleRepository.save(schedule);
 
         return convertToScheduleResponse(schedule, accountId);
@@ -98,8 +99,9 @@ public class ScheduleService {
 
         // 요청된 participants와 일치하는 Participant 객체를 생성
         List<Participant> participants = convertToParticipants(request.getParticipants(), crews);
+        participants.add(new Participant(updater));
 
-        schedule.setSchedule(request, crews, participants);
+        schedule.setSchedule(request, crews, participants, false);
         scheduleRepository.save(schedule);
 
         return convertToScheduleResponse(schedule, accountId);
@@ -161,6 +163,7 @@ public class ScheduleService {
         String individualColor = individualColors.getOrDefault(accountId, schedule.getCrews().getLabelColor());
 
         return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
-                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), schedule.getCrews().getCrewName(), individualColor, participantInfos);
+                schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), schedule.getCrews().getCrewName(),
+                individualColor, participantInfos, false);
     }
 }

@@ -41,7 +41,7 @@ public class ScheduleResponse {
 
     public ScheduleResponse(Long scheduleId, String title, LocalDateTime startDateTime, LocalDateTime endDateTime,
                             String location, String description, Long crewId, String crewName, String labelColor,
-                            List<ParticipantInfo> participants) {
+                            List<ParticipantInfo> participants, boolean isCoordinate) {
         this.scheduleId = scheduleId;
         this.title = title;
         this.startDateTime = startDateTime;
@@ -50,7 +50,7 @@ public class ScheduleResponse {
         this.description = description;
         this.crewInfo = new CrewInfo(crewId, crewName, labelColor);
         this.participants = participants;
-        this.isCoordinate = false;
+        this.isCoordinate = isCoordinate;
     }
 
     public static class CrewInfo {
