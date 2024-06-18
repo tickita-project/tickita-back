@@ -164,6 +164,6 @@ public class ScheduleService {
 
         return new ScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getStartDateTime(), schedule.getEndDateTime(),
                 schedule.getLocation(), schedule.getDescription(), schedule.getCrews().getId(), schedule.getCrews().getCrewName(),
-                individualColor, participantInfos, false);
+                individualColor, participantInfos, schedule.isCoordinate());
     }
 }
