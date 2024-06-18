@@ -11,5 +11,4 @@ import java.util.Optional;
 @Repository
 public interface CrewsRepository extends JpaRepository<Crews, Long> {
     List<Crews> findByCrewLists(List<CrewList> crewList);
-
 }

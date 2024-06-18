@@ -80,6 +80,7 @@ public class OauthService {
 
     //1. "인가 코드"로 "액세스 토큰" 요청
     private String getAccessToken(String code) {
+
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -87,11 +88,24 @@ public class OauthService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         String requestURL = httpServletRequest.getRequestURL().toString();
-        if (requestURL.contains("localhost:3000")){
-            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
-        } else {
-            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
-        }
+        System.out.println("requestURL = " + requestURL);
+
+//        if (requestURL.contains("login/oauth/kakao")){
+//            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
+//        } else {
+//            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
+//        }
+
+//        if (requestURL.contains("localhost:8080")){
+//            KAKAO_REDIRECT_URI = "http://localhost:8080/login/oauth2/code/kakao";
+//        } else if (requestURL.contains("login/oauth/kakao")) {
+//            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
+//        } else {
+//            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
+//        }
+
+        System.out.println("KAKAO_REDIRECT_URI = " + KAKAO_REDIRECT_URI.toString());
+
         body.add("grant_type", "authorization_code");
         body.add("client_id", KAKAO_CLIENT_ID);
         body.add("redirect_uri", KAKAO_REDIRECT_URI);
@@ -105,7 +119,7 @@ public class OauthService {
                 HttpMethod.POST,
                 kakaoTokenRequest,
                 String.class
-        );;
+        );
 
 
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱

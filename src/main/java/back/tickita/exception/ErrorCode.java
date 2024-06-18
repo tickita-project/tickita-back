@@ -22,7 +22,9 @@ public enum ErrorCode {
     INVITATION_ALREADY_SENT(HttpStatus.BAD_REQUEST, "이미 초대 된 회원입니다."),
     INVITATION_INVALID(HttpStatus.BAD_REQUEST, "잘못 초대 하였습니다."),
     INVITATION_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "그룹 상태값이 다릅니다."),
-    NOTIFICATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "알림을 찾을 수 없습니다.");
+    NOTIFICATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "알림을 찾을 수 없습니다."),
+    VOTE_SUBJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "투표를 찾을 수 없습니다.")
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;

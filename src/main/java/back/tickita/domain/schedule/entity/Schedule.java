@@ -54,4 +54,13 @@ public class Schedule extends BaseEntity {
             participant.setSchedule(this);
         }
     }
+
+    public Schedule(String title, LocalDateTime startDateTime, LocalDateTime endDateTime, String location, String description, Crews crews) {
+        this.title = title;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.location = location;
+        this.description = description;
+        this.crews = crews;
+    }
 }

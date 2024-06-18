@@ -30,4 +30,9 @@ public class Participant {
     public Participant(Account account) {
         this.account = account;
     }
+
+    public Participant(Account account, Schedule schedule) {
+        this.account = account;
+        this.schedule = schedule;
+    }
 }
