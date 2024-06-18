@@ -36,6 +36,9 @@ public class ScheduleResponse {
     @Schema(description = "참석자", example = "[{\"accountId\": 1, \"nickName\": \"User1\"}, {\"accountId\": 2, \"nickName\": \"User2\"}]")
     private List<ParticipantInfo> participants;
 
+    @Schema(description = "조율여부", example = "false")
+    private boolean isCoordinate;
+
     public ScheduleResponse(Long scheduleId, String title, LocalDateTime startDateTime, LocalDateTime endDateTime,
                             String location, String description, Long crewId, String crewName, String labelColor,
                             List<ParticipantInfo> participants) {
@@ -47,6 +50,7 @@ public class ScheduleResponse {
         this.description = description;
         this.crewInfo = new CrewInfo(crewId, crewName, labelColor);
         this.participants = participants;
+        this.isCoordinate = false;
     }
 
     public static class CrewInfo {
