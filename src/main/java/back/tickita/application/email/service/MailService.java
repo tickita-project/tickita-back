@@ -118,7 +118,7 @@ public class MailService {
             throw new TickitaException(ErrorCode.INVITATION_ALREADY_SENT);
         }
 
-        CrewList crewList = new CrewList(crews, invite, CrewRole.MEMBER, CrewAccept.WAIT);
+        CrewList crewList = new CrewList(crews, invite, crews.getLabelColor(), CrewRole.MEMBER, CrewAccept.WAIT);
         crewListRepository.save(crewList);
 
         Notification savedNotification = notificationRepository.save(new Notification(NotificationType.INVITE));

@@ -3,6 +3,7 @@ package back.tickita.domain.crews.repository;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
+import back.tickita.domain.crews.enums.CrewRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,5 @@ public interface CrewListRepository extends JpaRepository<CrewList, Long> {
     Optional<CrewList> findByCrewsId(Long crewId);
 
     List<CrewList> findByCrews(Crews crews);
+    boolean existsByCrewsIdAndAccountIdAndCrewRole(Long crewId, Long accountId, CrewRole role);
 }

@@ -8,6 +8,8 @@ import back.tickita.application.accountInfo.dto.response.AccountInfoResponse;
 import back.tickita.application.accountInfo.dto.response.AccountResponse;
 import back.tickita.application.accountInfo.service.InfoReadService;
 import back.tickita.application.accountInfo.service.InfoWriteService;
+import back.tickita.exception.ErrorCode;
+import back.tickita.exception.TickitaException;
 import back.tickita.interceptor.annotation.LoginUser;
 import back.tickita.security.response.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +52,16 @@ public class AccountInfoController {
     @Operation(summary = "회원 이메일 조회", description = "로그인 한 회원의 이메일을 조회합니다.")
     public AccountResponse findAccountEmail(@PathVariable(value = "accountId") Long accountId){
         return infoReadService.findAccountEmail(accountId);
+    }
+
+    @PutMapping("/{accountId}")
+    @Operation(summary = "회원 정보 수정", description = "로그인 한 회원의 정보를 수정합니다.")
+    public AccountInfoResponse updateAccountInfo(@LoginUser LoginUserInfo loginUserInfo, @PathVariable(value = "accountId") Long accountId,
+                                                 @RequestBody AccountInfoRequest accountInfoRequest) {
+        if (!accountId.equals(loginUserInfo.accountId())) {
+            throw new TickitaException(ErrorCode.FORBIDDEN_ACCESS);
+        }
+        return infoWriteService.updateAccountInfo(accountInfoRequest);
     }
 
     @DeleteMapping

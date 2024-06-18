@@ -39,7 +39,7 @@ public class ScheduleController {
     public ResponseEntity<ScheduleResponse> getScheduleById(@LoginUser LoginUserInfo loginUserInfo, @PathVariable Long scheduleId) {
         Account account = accountRepository.findById(loginUserInfo.accountId())
                 .orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-        return ResponseEntity.ok(scheduleService.getScheduleById(scheduleId));
+        return ResponseEntity.ok(scheduleService.getScheduleById(scheduleId, loginUserInfo.accountId()));
     }
 
     @PutMapping("/{scheduleId}")
