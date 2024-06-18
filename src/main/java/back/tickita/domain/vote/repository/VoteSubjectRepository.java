@@ -30,6 +30,4 @@ public interface VoteSubjectRepository extends JpaRepository<VoteSubject, Long> 
     @Query("UPDATE VoteSubject SET voteEndType = 'FINISH' WHERE id = :voteSubjectId")
     void updateVoteEndType(@Param("voteSubjectId") Long voteSubjectId);
 
-    List<VoteSubject> findAllByCrews(Crews crews);
-
 }

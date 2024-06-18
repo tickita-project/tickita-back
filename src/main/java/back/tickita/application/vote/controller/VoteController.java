@@ -4,6 +4,7 @@ package back.tickita.application.vote.controller;
 import back.tickita.application.account.dto.request.LoginUserInfo;
 import back.tickita.application.vote.dto.request.VoteStateRequest;
 import back.tickita.application.vote.dto.request.VoteSubjectRequest;
+import back.tickita.application.vote.dto.response.VoteMypageResponse;
 import back.tickita.application.vote.dto.response.VoteParticipantTimeList;
 import back.tickita.application.vote.dto.response.VoteStateResponse;
 import back.tickita.application.vote.dto.response.VoteSubjectResponse;
@@ -54,5 +55,9 @@ public class VoteController {
         return voteReadService.findParticipantTime(crewId, voteSubjectId);
     }
 
-
+    @GetMapping
+    @Operation(summary = "마이페이지 일정 조율 투표 정보 조회", description = "마이페이지 일정 조율 정보(투표 현황) 조회합니다.")
+    public List<VoteMypageResponse> findMypageVote(@LoginUser LoginUserInfo loginUserInfo) {
+        return voteReadService.findMypageVote(loginUserInfo.accountId());
+    }
 }

@@ -5,6 +5,7 @@ import back.tickita.common.BaseEntity;
 import back.tickita.domain.account.entity.Account;
 import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
+import back.tickita.domain.vote.enums.VoteEndType;
 import back.tickita.domain.vote.enums.VoteType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -56,5 +57,11 @@ public class VoteList extends BaseEntity {
 
     public Account getAccount() {
         return crewList != null ? crewList.getAccount() : null;
+    }
+    public VoteEndType getVoteEndType() {
+        return voteSubject != null ? voteSubject.getVoteEndType() : null;
+    }
+    public String getParticipateName() {
+        return crewList != null && crewList.getAccountName() != null ? crewList.getAccountName() : null;
     }
 }

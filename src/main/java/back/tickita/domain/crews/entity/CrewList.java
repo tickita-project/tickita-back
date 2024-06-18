@@ -60,4 +60,8 @@ public class CrewList extends BaseEntity {
     public void setIndividualColor(String labelColor) {
         this.individualColor = labelColor;
     }
+
+    public String getAccountName() {
+        return account != null ? account.getNickName() : null;
+    }
 }

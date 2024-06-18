@@ -87,8 +87,6 @@ public class OauthService {
 
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        String requestURL = httpServletRequest.getRequestURL().toString();
-        System.out.println("requestURL = " + requestURL);
 
 //        if (requestURL.contains("login/oauth/kakao")){
 //            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
@@ -103,9 +101,6 @@ public class OauthService {
 //        } else {
 //            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
 //        }
-
-        System.out.println("KAKAO_REDIRECT_URI = " + KAKAO_REDIRECT_URI.toString());
-
         body.add("grant_type", "authorization_code");
         body.add("client_id", KAKAO_CLIENT_ID);
         body.add("redirect_uri", KAKAO_REDIRECT_URI);

@@ -26,7 +26,12 @@ public interface VoteListRepository extends JpaRepository<VoteList, Long> {
              INNER JOIN vote_subject as vsj on vl.vote_subject_id = vsj.id
               WHERE vsj.vote_end_type = 'PROGRESS' AND vsj.end_date != :endDate AND vsj.end_time != :endTime GROUP BY vl.vote_subject_id
             """, nativeQuery = true)
-    List<VoteCount> countByVoteSubject(@Param("endDate")LocalDate endDate, @Param("endTime")LocalTime endTime);
+    List<VoteCount> countByVoteSubject(@Param("endDate") LocalDate endDate, @Param("endTime") LocalTime endTime);
 
     List<VoteList> findAllByVoteSubjectId(Long voteSubjectId);
+
+    @Query("""
+                    SELECT vl FROM VoteList vl JOIN FETCH vl.crewList cl JOIN FETCH cl.account WHERE vl.voteSubject.id = :voteSubjectId AND vl.voteType = :voteType 
+            """)
+    Optional<VoteList> findByVoteSubjectIdAndVoteTypeFetchJoin(@Param("voteSubjectId") Long voteSubjectId, @Param("voteType") VoteType voteType);
 }

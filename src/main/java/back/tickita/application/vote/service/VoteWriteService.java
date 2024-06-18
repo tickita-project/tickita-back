@@ -102,17 +102,6 @@ public class VoteWriteService {
         coordinationNotificationRepository.save(new CoordinationNotification(savedNotification, findVoteSubject));
     }
 
-    /**
-     * 투표 기능 개발
-     * 참석자는 중복 투표 가능
-     * 투표를 했을시 그 일정에 대한 투표 count up
-     * 투표 참여 false -> true
-     * 마감시간이 지난 투표는 에러 처리
-     * <p>
-     * <p>
-     * creList = 1 crewId = 1, accountid  = 2
-     * 1, PARTICIPANT
-     */
     public void setVote(Long accountId, VoteStateRequest voteStateRequest, Long voteSubjectId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND)); // 투표하는 회원
         CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(accountId, voteStateRequest.getCrewId()).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND)); // 회원이 크루 반환
@@ -146,8 +135,6 @@ public class VoteWriteService {
      */
 
 
-//
-
     // 스케줄러를 1초씩돌리고 현재시간 = 마감 시간이랑 동일하면 -> 상태값 변경 -> 스케줄러 따로
     // 현재시간 기준으로 만약에 시간이랑 날짝 같으면 상태값 변경
     public void updateExpireVoteStatus(LocalDate nowDate, LocalTime nowTime) {
@@ -161,9 +148,6 @@ public class VoteWriteService {
 
 
         //마감 되지 않아도 투표가 완료되면 변경
-        // 1. 참여 인원 수 체크  6->
-        // 2. voteComplete 투표한거 가져오기
-        // -> distinct 중복제거 -> 사용자를 중복제거
         List<VoteCount> voteCounts = voteListRepository.countByVoteSubject(nowDate, nowTime); // 전체 투표 별 참여 인원수 추출
         for (VoteCount voteCount : voteCounts) {
             Integer voteCompleteCount = voteCompleteRepository.countVoteComplete(voteCount.getVoteSubjectId());

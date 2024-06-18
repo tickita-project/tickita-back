@@ -14,6 +14,7 @@ import back.tickita.domain.schedule.repository.ScheduleRepository;
 import back.tickita.domain.vote.entity.VoteList;
 import back.tickita.domain.vote.entity.VoteState;
 import back.tickita.domain.vote.entity.VoteSubject;
+import back.tickita.domain.vote.enums.VoteEndType;
 import back.tickita.domain.vote.enums.VoteType;
 import back.tickita.domain.vote.repository.VoteListRepository;
 import back.tickita.domain.vote.repository.VoteStateRepository;
@@ -66,7 +67,8 @@ public class VoteReadService {
                 .map(it -> new VoteDateListResponse(it.getScheduleDate(), it.getScheduleStartTime(), it.getScheduleEndTime()))
                 .collect(Collectors.toList());
 
-        VoteState voteState = voteStateRepository.findById(voteSubject.getId()).orElse(null);;
+        VoteState voteState = voteStateRepository.findById(voteSubject.getId()).orElse(null);
+        ;
 
         String remainTime = voteSubject.getRemainTime();
 
@@ -74,17 +76,17 @@ public class VoteReadService {
                 creatorVote.getCrewList().getAccount().getId(), voteListResponses, voteSubject.getEndTime(), voteSubject.getEndDate(), voteDateListResponses, voteState.getVoteCount(), remainTime);
     }
 
-    public VoteParticipantTimeList findParticipantTime(Long crewId, Long voteSubjectId){
-       Crews crews = crewsRepository.findById(crewId).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
+    public VoteParticipantTimeList findParticipantTime(Long crewId, Long voteSubjectId) {
+        Crews crews = crewsRepository.findById(crewId).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
 
-       List<VoteList> voteLists = voteListRepository.findAllByVoteSubjectId(voteSubjectId);
+        List<VoteList> voteLists = voteListRepository.findAllByVoteSubjectId(voteSubjectId);
 
-       List<ParticipantTime> participantTimes = new ArrayList<>();
+        List<ParticipantTime> participantTimes = new ArrayList<>();
         for (VoteList voteList : voteLists) {
             CrewList crewList = voteList.getCrewList();
             List<Schedule> schedules = scheduleRepository.findAllByCrews(crews);
 
-            for (Schedule schedule : schedules){
+            for (Schedule schedule : schedules) {
                 ParticipantTime participantTime = new ParticipantTime();
                 participantTime.setParticipant(crewList.getAccount().getId(), schedule.getStartDateTime(), schedule.getEndDateTime());
                 participantTimes.add(participantTime);
@@ -96,11 +98,27 @@ public class VoteReadService {
         return voteParticipantTimeList;
     }
 
-//    public VoteMypageResponse findMypageVote(Long accountId) {
-//        Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-//        List<CrewList> crewList = crewListRepository.findAllByAccountId(account.getId());
-//        List<Crews> crews = crewsRepository.findByCrewLists(crewList);
-//
-//        crewList.stream().map(it -> new VoteMypageResponse(it.getCrews().getId(), ))
-//    }
+    public List<VoteMypageResponse> findMypageVote(Long accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
+        List<VoteMypageResponse> results = new ArrayList<>();
+        List<CrewList> crewLists = crewListRepository.findAllByAccountId(account.getId());
+        for (CrewList crewList : crewLists) {
+            List<VoteList> voteList = crewList.getVoteList();
+            for (VoteList voteParticipant : voteList) {
+                Long voteSubjectId = voteParticipant.getVoteSubject().getId();
+                if (voteParticipant.getVoteEndType() != null && voteParticipant.getVoteEndType() == VoteEndType.PROGRESS) {
+                    VoteList voteCreator = voteListRepository.findByVoteSubjectIdAndVoteTypeFetchJoin(voteSubjectId, VoteType.CREATOR).orElse(null);
+                    Long voteCreatorId = null;
+                    String voteCreatorName = null;
+                    if (voteCreator != null) {
+                        voteCreatorName = voteCreator.getParticipateName();
+                        voteCreatorId = voteCreator.getId();
+                    }
+                    results.add(new VoteMypageResponse(crewList.getCrews().getId(), voteParticipant.getVoteSubject().getTitle(), voteCreatorId, voteCreatorName, voteParticipant.getVoteSubject().getEndTime(),
+                            voteParticipant.getVoteSubject().getEndDate(), voteParticipant.getVoteParticipateType()));
+                }
+            }
+        }
+        return results;
+    }
 }
