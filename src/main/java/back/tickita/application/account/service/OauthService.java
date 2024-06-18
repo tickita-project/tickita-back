@@ -88,19 +88,13 @@ public class OauthService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 
-//        if (requestURL.contains("login/oauth/kakao")){
-//            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
-//        } else {
-//            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
-//        }
+        String requestURL = httpServletRequest.getRequestURL().toString();
+        if (requestURL.contains("login/oauth/kakao")){
+            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
+        } else {
+            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
+        }
 
-//        if (requestURL.contains("localhost:8080")){
-//            KAKAO_REDIRECT_URI = "http://localhost:8080/login/oauth2/code/kakao";
-//        } else if (requestURL.contains("login/oauth/kakao")) {
-//            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
-//        } else {
-//            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
-//        }
         body.add("grant_type", "authorization_code");
         body.add("client_id", KAKAO_CLIENT_ID);
         body.add("redirect_uri", KAKAO_REDIRECT_URI);
