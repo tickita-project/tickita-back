@@ -45,7 +45,7 @@ public class CrewsReadService {
     }
 
     public CrewDetailResponse getCrewDetails(Long accountId, Long crewId) {
-        CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(1L, crewId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
+        CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(accountId, crewId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         Crews crews = crewList.getCrews();
 
