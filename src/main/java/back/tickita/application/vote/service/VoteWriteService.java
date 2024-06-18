@@ -175,7 +175,7 @@ public class VoteWriteService {
                 voteState.getScheduleEndTime().getHour(), voteState.getScheduleEndTime().getMinute(), voteState.getScheduleEndTime().getSecond());
 
         Schedule savedSchedule = scheduleRepository.save(
-                new Schedule(voteSubject.getTitle(), startDateTime, endDateTime, voteSubject.getPlace(), voteSubject.getContent(), voteSubject.getCrews())
+                new Schedule(voteSubject.getTitle(), startDateTime, endDateTime, voteSubject.getPlace(), voteSubject.getContent(), voteSubject.getCrews(), true)
         );
         List<VoteList> voteLists = voteListRepository.findAllByVoteSubjectId(voteSubject.getId());
         for (VoteList voteList : voteLists) {
