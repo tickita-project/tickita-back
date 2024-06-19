@@ -1,6 +1,7 @@
 package back.tickita.application.account.controller;
 
 import back.tickita.application.account.service.OauthService;
+import back.tickita.domain.token.repository.TokenRepository;
 import back.tickita.security.response.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
     private final OauthService oauthService;
+    private final TokenRepository tokenRepository;
 
     @GetMapping("/login/oauth/kakao")
     @Operation(summary = "kakao 로그인", description = "로그인 한 회원의 정보를 등록합니다.")
@@ -31,5 +33,12 @@ public class LoginController {
     @Operation(summary = "kakao 토큰 재발급", description = "만료된 토큰을 재발급 합니다.")
     public TokenResponse setRefreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
         return oauthService.refresh(refreshTokenRequest.refresh());
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃", description = "로그인 한 회원의 토큰을 삭제합니다.")
+    public ResponseEntity<String> logout(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        tokenRepository.deleteByRefresh(refreshTokenRequest.refresh());
+        return ResponseEntity.ok("로그아웃 성공");
     }
 }
