@@ -21,6 +21,12 @@ public class LoginController {
         return ResponseEntity.ok(oauthService.kakaoLogin(code));
     }
 
+    @GetMapping("/login/oauth2/code/google")
+    @Operation(summary = "Google 로그인", description = "로그인 한 회원의 정보를 등록합니다.")
+    public ResponseEntity<TokenResponse> googleLogin(@RequestParam String code) {
+        return ResponseEntity.ok(oauthService.googleLogin(code));
+    }
+
     @PostMapping("/token/refresh")
     @Operation(summary = "kakao 토큰 재발급", description = "만료된 토큰을 재발급 합니다.")
     public TokenResponse setRefreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
