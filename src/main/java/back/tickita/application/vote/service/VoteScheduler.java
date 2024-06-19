@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -16,9 +17,11 @@ import java.util.List;
 public class VoteScheduler {
     private final VoteWriteService voteWriteService;
     private final VoteSubjectRepository voteSubjectRepository;
+    private final VoteReadService voteReadService;
 
     @Scheduled(cron = "*/1 * * * * *")
     public void checkAndSaveFinalSchedule() {
         voteWriteService.updateExpireVoteStatus(LocalDate.now(), LocalTime.now());
+        voteReadService.processExpiredNotifications(LocalDateTime.now());
     }
 }

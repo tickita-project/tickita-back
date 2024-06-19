@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VoteCompleteRepository extends JpaRepository<VoteComplete, Long> {
@@ -16,7 +17,6 @@ public interface VoteCompleteRepository extends JpaRepository<VoteComplete, Long
                           where vs.vote_subject_id = :voteSubjectId;             
             """, nativeQuery = true)
     Integer countVoteComplete(@Param("voteSubjectId") Long voteSubjectId);
-
 
     List<VoteComplete> findAllByVoteListIn(List<VoteList> voteLists);
 }
