@@ -56,7 +56,6 @@ public class SecurityConfig {
                                         AntPathRequestMatcher.antMatcher("/swagger-resources/**"),
                                         AntPathRequestMatcher.antMatcher("/mail/**")
                                 ).permitAll().anyRequest().permitAll()
-
                 )
                 .headers(
                         headersConfigurer ->
@@ -64,7 +63,8 @@ public class SecurityConfig {
                                         .frameOptions(
                                                 HeadersConfigurer.FrameOptionsConfig::sameOrigin
                                         )
-                );
+                )
+                .logout(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
