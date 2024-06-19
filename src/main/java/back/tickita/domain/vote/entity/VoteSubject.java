@@ -1,11 +1,8 @@
 package back.tickita.domain.vote.entity;
 
-import back.tickita.application.vote.dto.request.VoteParticipantRequest;
 import back.tickita.common.BaseEntity;
-import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
 import back.tickita.domain.vote.enums.VoteEndType;
-import back.tickita.domain.vote.enums.VoteType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -61,23 +58,13 @@ public class VoteSubject extends BaseEntity {
         this.voteEndType = VoteEndType.FINISH;
     }
 
-    public String getRemainTime() {
+    public long getRemainTime() {
         LocalDateTime endDateTime = LocalDateTime.of(this.endDate, this.endTime);
         Duration duration = Duration.between(LocalDateTime.now(), endDateTime);
 
         if (duration.isNegative()){
-            return "마감됨";
+            return 0;
         }
-        long days = duration.toDays();
-        long hours = duration.toHours() % 24;
-        long minutes = duration.toMinutes() % 60;
-
-        if (days > 0) {
-            return days + "일 남음";
-        }else if (hours > 0) {
-            return hours + "시간 남음";
-        }else {
-            return minutes + "분 남음";
-        }
+        return duration.getSeconds();
     }
 }

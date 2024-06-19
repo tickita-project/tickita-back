@@ -44,14 +44,14 @@ public class VoteReadService {
     private final VoteStateRepository voteStateRepository;
     private final ScheduleRepository scheduleRepository;
 
-    public VoteStateResponse findVoteState(Long accountId, Long crewId) {
+    public VoteStateResponse findVoteState(Long accountId, Long crewId, Long voteSubjectId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
         if (!crewListRepository.existsByAccountIdAndCrewsId(account.getId(), crewId)) {
             throw new TickitaException(ErrorCode.CREW_NOT_FOUND);
         }
 
         Crews crews = crewsRepository.findById(crewId).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
-        VoteSubject voteSubject = voteSubjectRepository.findByCrewsId(crewId).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
+        VoteSubject voteSubject = voteSubjectRepository.findByCrewsIdAndId(crews.getId(), voteSubjectId).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
 
         VoteList creatorVote = voteListRepository.findByVoteSubjectIdAndVoteType(voteSubject.getId(), VoteType.CREATOR)
                 .orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -64,16 +64,14 @@ public class VoteReadService {
         List<VoteState> voteDates = voteStateRepository.findByVoteSubjectId(voteSubject.getId());
 
         List<VoteDateListResponse> voteDateListResponses = voteDates.stream()
-                .map(it -> new VoteDateListResponse(it.getScheduleDate(), it.getScheduleStartTime(), it.getScheduleEndTime()))
+                .map(it -> new VoteDateListResponse(it.getScheduleDate(), it.getScheduleStartTime(), it.getScheduleEndTime(), it.getVoteCount()))
                 .collect(Collectors.toList());
 
         VoteState voteState = voteStateRepository.findById(voteSubject.getId()).orElse(null);
-        ;
+        Long remainTime = voteSubject.getRemainTime();
 
-        String remainTime = voteSubject.getRemainTime();
-
-        return new VoteStateResponse(voteSubject.getTitle(), voteSubject.getContent(), voteSubject.getPlace(), crews.getId(), crews.getCrewName(),
-                creatorVote.getCrewList().getAccount().getId(), voteListResponses, voteSubject.getEndTime(), voteSubject.getEndDate(), voteDateListResponses, voteState.getVoteCount(), remainTime);
+        return new VoteStateResponse(voteSubject.getTitle(), voteSubject.getContent(), voteSubject.getPlace(), crews.getId(), crews.getCrewName(), crews.getLabelColor(),
+                creatorVote.getCrewList().getAccount().getId(), creatorVote.getCrewList().getAccount().getNickName(), voteListResponses, voteSubject.getEndTime(), voteSubject.getEndDate(), voteDateListResponses, remainTime);
     }
 
     public VoteParticipantTimeList findParticipantTime(Long crewId, Long voteSubjectId) {
@@ -114,7 +112,7 @@ public class VoteReadService {
                         voteCreatorName = voteCreator.getParticipateName();
                         voteCreatorId = voteCreator.getId();
                     }
-                    results.add(new VoteMypageResponse(crewList.getCrews().getId(), voteParticipant.getVoteSubject().getTitle(), voteCreatorId, voteCreatorName, voteParticipant.getVoteSubject().getEndTime(),
+                    results.add(new VoteMypageResponse(crewList.getCrews().getId(), crewList.getCrews().getCrewName() ,voteParticipant.getVoteSubject().getTitle(), voteCreatorId, voteCreatorName, voteParticipant.getVoteSubject().getEndTime(),
                             voteParticipant.getVoteSubject().getEndDate(), voteParticipant.getVoteParticipateType()));
                 }
             }

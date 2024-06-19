@@ -37,10 +37,10 @@ public class VoteController {
        voteWriteService.create(loginUserInfo.accountId(), voteSubjectRequest);
     }
 
-    @GetMapping("/{crewId}")
+    @GetMapping("/{crewId}/{voteSubjectId}")
     @Operation(summary = "일정 조율 투표 정보 조회", description = "일정 조율 정보(투표 현황) 조회합니다.")
-    public VoteStateResponse findVoteState(@LoginUser LoginUserInfo loginUserInfo, @PathVariable("crewId") Long crewId){
-        return voteReadService.findVoteState(loginUserInfo.accountId(), crewId);
+    public VoteStateResponse findVoteState(@LoginUser LoginUserInfo loginUserInfo, @PathVariable("crewId") Long crewId, @PathVariable("voteSubjectId") Long voteSubjectId){
+        return voteReadService.findVoteState(loginUserInfo.accountId(), crewId, voteSubjectId);
     }
 
     @PostMapping("/{voteSubjectId}")
@@ -49,7 +49,7 @@ public class VoteController {
         voteWriteService.setVote(loginUserInfo.accountId(), voteStateRequest, voteSubjectId);
     }
 
-    @GetMapping("/{crewId}/{voteSubjectId}")
+    @GetMapping("participant/{crewId}/{voteSubjectId}")
     @Operation(summary = "일정 조율 참석자 일정 리스트", description = "일정 조율 참석자의 일정 있는 리스트를 조회합니다.")
     public VoteParticipantTimeList findParticipantTime(@PathVariable(value = "crewId") Long crewId, @PathVariable(value = "voteSubjectId") Long voteSubjectId){
         return voteReadService.findParticipantTime(crewId, voteSubjectId);

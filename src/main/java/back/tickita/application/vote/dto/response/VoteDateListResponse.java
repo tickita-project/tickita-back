@@ -23,9 +23,13 @@ public class VoteDateListResponse {
     @Schema(description = "일정 조율 마감 시간", example = "17:00:00")
     private LocalTime voteEndTime;
 
-    public VoteDateListResponse(LocalDate voteDate, LocalTime voteStartTime, LocalTime voteEndTime) {
+    @Schema(description = "투표 개수", example = "1")
+    private int voteCount;
+
+    public VoteDateListResponse(LocalDate voteDate, LocalTime voteStartTime, LocalTime voteEndTime, int voteCount) {
         this.voteDate = voteDate;
         this.voteStartTime = voteStartTime;
         this.voteEndTime = voteEndTime;
+        this.voteCount = voteCount;
     }
 }

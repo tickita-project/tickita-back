@@ -15,13 +15,16 @@ public class VoteMypageResponse {
     @Schema(description = "그룹id", example = "1")
     private Long crewId;
 
+    @Schema(description = "그룹 이름", example = "코드잇")
+    private String crewName;
+
     @Schema(description = "일정 조율 제목", example = "코드잇 회의")
     private String title;
 
     @Schema(description = "일정 조율 생성자 id", example = "1")
     private Long voteCreatorId;
 
-    @Schema(description = "일정 조율 생성자 닉네임", example = "2024-06-19")
+    @Schema(description = "일정 조율 생성자 닉네임", example = "밍밍")
     private String voteCreatorName;
 
     @Schema(description = "일정 조율 마감시간", example = "23:59:00")
