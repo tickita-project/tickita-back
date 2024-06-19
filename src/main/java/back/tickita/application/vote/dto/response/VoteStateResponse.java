@@ -27,8 +27,14 @@ public class VoteStateResponse {
     @Schema(description = "그룹 이름", example = "코드잇")
     private String crewName;
 
+    @Schema(description = "그룹 색상", example = "F5C92E")
+    private String crewLabelColor;
+
     @Schema(description = "일정 조율 생성자 id", example = "1")
     private Long creatorId;
+
+    @Schema(description = "일정 조율 생성자 닉네임", example = "밍밍")
+    private String creatorNickName;
 
     private List<VoteListResponse> voteListResponses;
 
@@ -40,13 +46,10 @@ public class VoteStateResponse {
 
     private List<VoteDateListResponse> voteDateListResponses;
 
-    @Schema(description = "투표 개수", example = "1")
-    private int voteCount;
-
     @Schema(description = "마감까지 남은 시간", example = "1일 남음")
-    private String remainTime;
+    private Long remainTime;
 
-    public void setRemainTime(String remainTime) {
+    public void setRemainTime(Long remainTime) {
         this.remainTime = remainTime;
     }
 }

@@ -20,6 +20,8 @@ import java.util.Optional;
 public interface VoteSubjectRepository extends JpaRepository<VoteSubject, Long> {
 
     Optional<VoteSubject> findByCrewsId(Long crewId);
+
+    Optional<VoteSubject> findByCrewsIdAndId(Long crewId, Long voteSubjectId);
     //base 현재 기준 =
     //database -> DATE_FORMAT(date_column, '%Y-%m-%d')
     // 현재 시간은 date_format(now(),'%H:%i:%s')
