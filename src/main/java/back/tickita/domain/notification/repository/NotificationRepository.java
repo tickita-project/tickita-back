@@ -8,5 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    Long countByIsChecked(Boolean isChecked);
 }

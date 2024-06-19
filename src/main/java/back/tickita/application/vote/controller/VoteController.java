@@ -4,10 +4,7 @@ package back.tickita.application.vote.controller;
 import back.tickita.application.account.dto.request.LoginUserInfo;
 import back.tickita.application.vote.dto.request.VoteStateRequest;
 import back.tickita.application.vote.dto.request.VoteSubjectRequest;
-import back.tickita.application.vote.dto.response.VoteMypageResponse;
-import back.tickita.application.vote.dto.response.VoteParticipantTimeList;
-import back.tickita.application.vote.dto.response.VoteStateResponse;
-import back.tickita.application.vote.dto.response.VoteSubjectResponse;
+import back.tickita.application.vote.dto.response.*;
 import back.tickita.application.vote.service.VoteReadService;
 import back.tickita.application.vote.service.VoteWriteService;
 import back.tickita.domain.vote.entity.VoteSubject;
@@ -56,8 +53,8 @@ public class VoteController {
     }
 
     @GetMapping
-    @Operation(summary = "마이페이지 일정 조율 투표 정보 조회", description = "마이페이지 일정 조율 정보(투표 현황) 조회합니다.")
-    public List<VoteMypageResponse> findMypageVote(@LoginUser LoginUserInfo loginUserInfo) {
-        return voteReadService.findMypageVote(loginUserInfo.accountId());
+    @Operation(summary = "마이페이지 일정 조율 투표 알림 조회", description = "마이페이지 일정 조율 정보(투표 현황) 알림을 조회합니다.")
+    public CoordinationNotificationResponse findMypageVoteNotification(@LoginUser LoginUserInfo loginUserInfo) {
+        return voteReadService.findMypageVoteNotification(loginUserInfo.accountId());
     }
 }

@@ -8,14 +8,22 @@ import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
 import back.tickita.domain.crews.repository.CrewListRepository;
 import back.tickita.domain.crews.repository.CrewsRepository;
+import back.tickita.domain.notification.entity.CoordinationNotification;
+import back.tickita.domain.notification.entity.CrewNotification;
+import back.tickita.domain.notification.entity.Notification;
+import back.tickita.domain.notification.eums.NotificationType;
+import back.tickita.domain.notification.repository.CoordinationNotificationRepository;
+import back.tickita.domain.notification.repository.NotificationRepository;
 import back.tickita.domain.schedule.entity.Participant;
 import back.tickita.domain.schedule.entity.Schedule;
 import back.tickita.domain.schedule.repository.ScheduleRepository;
+import back.tickita.domain.vote.entity.VoteComplete;
 import back.tickita.domain.vote.entity.VoteList;
 import back.tickita.domain.vote.entity.VoteState;
 import back.tickita.domain.vote.entity.VoteSubject;
 import back.tickita.domain.vote.enums.VoteEndType;
 import back.tickita.domain.vote.enums.VoteType;
+import back.tickita.domain.vote.repository.VoteCompleteRepository;
 import back.tickita.domain.vote.repository.VoteListRepository;
 import back.tickita.domain.vote.repository.VoteStateRepository;
 import back.tickita.domain.vote.repository.VoteSubjectRepository;
@@ -25,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +52,9 @@ public class VoteReadService {
     private final VoteListRepository voteListRepository;
     private final VoteStateRepository voteStateRepository;
     private final ScheduleRepository scheduleRepository;
+    private final CoordinationNotificationRepository coordinationNotificationRepository;
+    private final VoteCompleteRepository voteCompleteRepository;
+    private final NotificationRepository notificationRepository;
 
     public VoteStateResponse findVoteState(Long accountId, Long crewId, Long voteSubjectId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -96,27 +108,41 @@ public class VoteReadService {
         return voteParticipantTimeList;
     }
 
-    public List<VoteMypageResponse> findMypageVote(Long accountId) {
+    public CoordinationNotificationResponse findMypageVoteNotification(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-        List<VoteMypageResponse> results = new ArrayList<>();
+        List<VoteNotificationResponse> results = new ArrayList<>();
         List<CrewList> crewLists = crewListRepository.findAllByAccountId(account.getId());
+
+        Long count = 0L;
+
         for (CrewList crewList : crewLists) {
             List<VoteList> voteList = crewList.getVoteList();
             for (VoteList voteParticipant : voteList) {
                 Long voteSubjectId = voteParticipant.getVoteSubject().getId();
                 if (voteParticipant.getVoteEndType() != null && voteParticipant.getVoteEndType() == VoteEndType.PROGRESS) {
-                    VoteList voteCreator = voteListRepository.findByVoteSubjectIdAndVoteTypeFetchJoin(voteSubjectId, VoteType.CREATOR).orElse(null);
-                    Long voteCreatorId = null;
-                    String voteCreatorName = null;
-                    if (voteCreator != null) {
-                        voteCreatorName = voteCreator.getParticipateName();
-                        voteCreatorId = voteCreator.getId();
+                    List<CoordinationNotification> coordinationNotifications = coordinationNotificationRepository.findAllByVoteSubjectIdAndNotification_NotificationType(voteSubjectId, NotificationType.REQUEST);
+                    for (CoordinationNotification coordinationNotification : coordinationNotifications) {
+                        coordinationNotification.getNotification().update(true);
+                        if (!coordinationNotification.getNotification().getIsChecked()){
+                            count++;
+                        }
+                        VoteNotificationResponse voteNotificationResponse = new VoteNotificationResponse();
+                        voteNotificationResponse.setVoteNotification(coordinationNotification.getNotification().getId(), coordinationNotification.getNotification().getNotificationType().name(),
+                                crewList.getCrews().getId(), account.getId(), crewList.getCrews().getCrewName(), coordinationNotification.getCreatedAt(), coordinationNotification.getNotification().getIsChecked(),
+                                voteSubjectId, coordinationNotification.getVoteSubject().getTitle(), voteParticipant.getVoteParticipateType());
+                        results.add(voteNotificationResponse);
                     }
-                    results.add(new VoteMypageResponse(crewList.getCrews().getId(), crewList.getCrews().getCrewName() ,voteParticipant.getVoteSubject().getTitle(), voteCreatorId, voteCreatorName, voteParticipant.getVoteSubject().getEndTime(),
-                            voteParticipant.getVoteSubject().getEndDate(), voteParticipant.getVoteParticipateType()));
                 }
             }
         }
-        return results;
+        return new CoordinationNotificationResponse(count, results);
+    }
+
+    public void processExpiredNotifications(LocalDateTime time) {
+        List<CoordinationNotification> expiredNotifications = coordinationNotificationRepository.findAllExpiredNotifications(time);
+
+        for (CoordinationNotification notification : expiredNotifications) {
+            notification.getNotification().update(true);
+        }
     }
 }
