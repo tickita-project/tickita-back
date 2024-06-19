@@ -9,7 +9,12 @@ import lombok.Setter;
 @Setter
 public class NotificationRequest {
 
+    @Schema(description = "알림 id", example = "1")
     private Long notificationId;
+
+    @Schema(description = "그룹 id", example = "1")
+    private Long crewId;
+
     @Schema(description = "그룹 초대 상태값", example = "ACCEPT,DECLINE,WAIT")
     private CrewAccept inviteType;
 }

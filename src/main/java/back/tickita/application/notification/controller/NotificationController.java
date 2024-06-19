@@ -1,6 +1,7 @@
 package back.tickita.application.notification.controller;
 
 import back.tickita.application.account.dto.request.LoginUserInfo;
+import back.tickita.application.notification.dto.request.InviteAcceptWitdrawlRequest;
 import back.tickita.application.notification.dto.request.NotificationRequest;
 import back.tickita.application.notification.dto.response.InviteNotificationResponse;
 import back.tickita.application.notification.dto.response.NotificationResponse;
@@ -31,5 +32,11 @@ public class NotificationController {
     @Operation(summary = "그룹 초대 알림 수락/거절", description = "그룹 초대가 온 회원이 수락/거절을 선택합니다.")
     public InviteNotificationResponse setInviteAccept(@LoginUser LoginUserInfo loginUserInfo, @RequestBody NotificationRequest notificationRequest){
         return notificationWriteService.setInviteAccept(loginUserInfo.accountId(), notificationRequest);
+    }
+
+    @DeleteMapping
+    @Operation(summary = "그룹 초대 삭제", description = "잘못 초대한 회원()을 그룹에서 삭제합니다.")
+    public String inviteWithdrawal(@LoginUser LoginUserInfo loginUserInfo, @RequestBody InviteAcceptWitdrawlRequest inviteAcceptWitdrawlRequest) {
+        return notificationWriteService.inviteWithdrawal(loginUserInfo.accountId(), inviteAcceptWitdrawlRequest);
     }
 }

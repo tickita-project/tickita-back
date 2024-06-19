@@ -20,6 +20,7 @@ public enum ErrorCode {
     UNABLE_TO_SEND_EMAIL(HttpStatus.BAD_REQUEST, "메일을 보낼 수 없습니다."),
     CREW_NOT_FOUND(HttpStatus.BAD_REQUEST, "그룹을 찾을 수 없습니다."),
     INVITATION_ALREADY_SENT(HttpStatus.BAD_REQUEST, "이미 초대 된 회원입니다."),
+    INVITATION_ALREADY_ACCEPTED(HttpStatus.BAD_REQUEST, "이미 그룹에 가입된 회원입니다."),
     INVITATION_INVALID(HttpStatus.BAD_REQUEST, "잘못 초대 하였습니다."),
     INVITATION_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "그룹 상태값이 다릅니다."),
     NOTIFICATION_NOT_FOUND(HttpStatus.BAD_REQUEST, "알림을 찾을 수 없습니다."),
