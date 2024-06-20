@@ -84,7 +84,7 @@ public class CrewsWriteService {
         newOwner.setCrewRole(CrewRole.OWNER);
         crewListRepository.save(newOwner);
 
-        return new CrewMemberInfoResponse(newOwner.getCrewRole().name(), newOwner.getAccount().getId(), newOwner.getAccount().getNickName(), newOwner.getAccount().getEmail());
+        return new CrewMemberInfoResponse(newOwner.getCrewRole().name(), newOwner.getAccount().getId(), newOwner.getAccount().getNickName(), newOwner.getAccount().getEmail(), newOwner.getAccount().getImage());
     }
 
     public CrewMessageResponse leaveCrew(Long crewId, Long accountId) {

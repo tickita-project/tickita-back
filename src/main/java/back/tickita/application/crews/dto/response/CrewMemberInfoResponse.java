@@ -20,4 +20,6 @@ public class CrewMemberInfoResponse {
     @Schema(description = "이메일", example = "test@test.com")
     private String email;
 
+    @Schema(description = "imgUrl")
+    private String image;
 }
