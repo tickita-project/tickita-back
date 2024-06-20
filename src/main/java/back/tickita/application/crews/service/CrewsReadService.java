@@ -40,7 +40,7 @@ public class CrewsReadService {
         List<CrewMemberInfoResponse> crewMemberInfos = crews.getCrewLists()
                 .stream()
                 .map(crewInfoList -> new CrewMemberInfoResponse(
-                        crewInfoList.getCrewRole().name(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail()))
+                        crewInfoList.getCrewRole().name(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail(), crewInfoList.getAccount().getImage()))
                 .sorted(Comparator.comparingInt(crewInfo -> CrewRole.valueOf(crewInfo.getRole()).getOrder()))
                 .collect(Collectors.toList());
 
@@ -52,11 +52,15 @@ public class CrewsReadService {
 
         Crews crews = crewList.getCrews();
 
+        if (crewList.getCrewAccept() != CrewAccept.ACCEPT) {
+            throw new TickitaException(ErrorCode.FORBIDDEN_ACCESS);
+        }
+
         List<CrewMemberInfoResponse> crewMemberInfos = crews.getCrewLists()
                 .stream()
                 .filter(crewInfoList -> crewInfoList.getCrewAccept() == CrewAccept.ACCEPT)
                 .map(crewInfoList -> new CrewMemberInfoResponse(
-                        crewInfoList.getCrewRole().name(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewList.getAccount().getEmail()))
+                        crewInfoList.getCrewRole().name(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail(), crewInfoList.getAccount().getImage()))
                 .collect(Collectors.toList());
 
         List<CrewWaitingMemberInfo> waitMembers = crews.getCrewLists()
@@ -77,6 +81,7 @@ public class CrewsReadService {
 
         List<CrewAllInfo> crewLists = crewList
                 .stream()
+                .filter(crewAll -> CrewAccept.ACCEPT.equals(crewAll.getCrewAccept()))
                 .map(crewAll -> new CrewAllInfo(
                         crewAll.getCrews().getId(), crewAll.getCrews().getCrewName(), crewAll.getCrews().getLabelColor()))
                 .collect(Collectors.toList());
