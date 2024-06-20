@@ -35,7 +35,7 @@ public class NotificationController {
     }
 
     @DeleteMapping
-    @Operation(summary = "그룹 초대 삭제", description = "잘못 초대한 회원()을 그룹에서 삭제합니다.")
+    @Operation(summary = "그룹 초대 삭제", description = "잘못 초대한 회원을 그룹에서 삭제합니다.")
     public String inviteWithdrawal(@LoginUser LoginUserInfo loginUserInfo, @RequestBody InviteAcceptWitdrawlRequest inviteAcceptWitdrawlRequest) {
         return notificationWriteService.inviteWithdrawal(loginUserInfo.accountId(), inviteAcceptWitdrawlRequest);
     }

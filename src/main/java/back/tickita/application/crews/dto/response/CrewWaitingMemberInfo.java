@@ -8,6 +8,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CrewWaitingMemberInfo {
 
+    @Schema(description = "알림 id", example = "1")
+    private Long notificationId;
+
     @Schema(description = "회원 id", example = "1")
     private Long accountId;
 

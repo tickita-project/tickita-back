@@ -129,7 +129,7 @@ public class VoteReadService {
                         VoteNotificationResponse voteNotificationResponse = new VoteNotificationResponse();
                         voteNotificationResponse.setVoteNotification(coordinationNotification.getNotification().getId(), coordinationNotification.getNotification().getNotificationType().name(),
                                 crewList.getCrews().getId(), account.getId(), crewList.getCrews().getCrewName(), coordinationNotification.getCreatedAt(), coordinationNotification.getNotification().getIsChecked(),
-                                voteSubjectId, coordinationNotification.getVoteSubject().getTitle(), voteParticipant.getVoteParticipateType());
+                                voteSubjectId, coordinationNotification.getVoteSubject().getTitle(), coordinationNotification.getVoteSubject().getEndTime(), coordinationNotification.getVoteSubject().getEndDate(), voteParticipant.getVoteParticipateType());
                         results.add(voteNotificationResponse);
                     }
                 }

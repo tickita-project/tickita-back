@@ -39,5 +39,4 @@ public class CrewNotificationResponse {
 
     @Schema(description = "content", example = "content")
     private String content;
-
 }

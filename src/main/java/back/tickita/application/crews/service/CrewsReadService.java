@@ -10,6 +10,8 @@ import back.tickita.domain.crews.enums.CrewAccept;
 import back.tickita.domain.crews.enums.CrewRole;
 import back.tickita.domain.crews.repository.CrewListRepository;
 import back.tickita.domain.crews.repository.CrewsRepository;
+import back.tickita.domain.notification.entity.Notification;
+import back.tickita.domain.notification.repository.NotificationRepository;
 import back.tickita.exception.ErrorCode;
 import back.tickita.exception.TickitaException;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class CrewsReadService {
 
     private final AccountRepository accountRepository;
     private final CrewListRepository crewListRepository;
+    private final NotificationRepository notificationRepository;
 
     public CrewInfoResponse getCrewInfo(Long accountId, Long crewId) {
         CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(accountId, crewId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -59,9 +62,11 @@ public class CrewsReadService {
         List<CrewWaitingMemberInfo> waitMembers = crews.getCrewLists()
                 .stream()
                 .filter(crewInfoList -> crewInfoList.getCrewAccept() == CrewAccept.WAIT)
-                .map(crewInfoList -> new CrewWaitingMemberInfo(
-                        crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail()))
-                .collect(Collectors.toList());
+                .map(crewInfoList -> {
+                    Notification notification = notificationRepository.findByCrewListId(crewInfoList.getId()).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+                    return new CrewWaitingMemberInfo(
+                                    notification.getId(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail());
+                }).collect(Collectors.toList());
 
         return new CrewDetailResponse(crews.getCrewName(), crewList.getIndividualColor(), crews.getId(), crewMemberInfos, waitMembers);
     }
