@@ -61,6 +61,7 @@ public class CrewsReadService {
                 .filter(crewInfoList -> crewInfoList.getCrewAccept() == CrewAccept.ACCEPT)
                 .map(crewInfoList -> new CrewMemberInfoResponse(
                         crewInfoList.getCrewRole().name(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail(), crewInfoList.getAccount().getImage()))
+                .sorted(Comparator.comparingInt(crewInfo -> CrewRole.valueOf(crewInfo.getRole()).getOrder()))
                 .collect(Collectors.toList());
 
         List<CrewWaitingMemberInfo> waitMembers = crews.getCrewLists()
