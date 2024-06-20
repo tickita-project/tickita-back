@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @AllArgsConstructor
@@ -40,11 +42,17 @@ public class VoteNotificationResponse {
     @Schema(description = "일정 조율(투표) 제목", example = "코드잇 회의")
     private String voteTitle;
 
+    @Schema(description = "일정 조율(투표) 마감 시간", example = "23:59:00")
+    private LocalTime endTime;
+
+    @Schema(description = "일정 조율(투표) 마감 날짜", example = "2024-06-19")
+    private LocalDate endDate;
+
     @Schema(description = "회원 투표 여부", example = "false,true")
     private Boolean voteParticipateType;
 
 
-    public void setVoteNotification(Long notificationId, String notificationType, Long crewId, Long accountId, String crewName, LocalDateTime localDateTime, Boolean isChecked, Long voteId, String voteTitle ,Boolean voteParticipateType) {
+    public void setVoteNotification(Long notificationId, String notificationType, Long crewId, Long accountId, String crewName, LocalDateTime localDateTime, Boolean isChecked, Long voteId, String voteTitle, LocalTime endTime, LocalDate endDate, Boolean voteParticipateType) {
         this.notificationId = notificationId;
         this.notificationType = notificationType;
         this.crewId = crewId;
@@ -54,6 +62,8 @@ public class VoteNotificationResponse {
         this.isChecked = isChecked;
         this.voteId = voteId;
         this.voteTitle = voteTitle;
+        this.endTime = endTime;
+        this.endDate = endDate;
         this.voteParticipateType = voteParticipateType;
     }
 }
