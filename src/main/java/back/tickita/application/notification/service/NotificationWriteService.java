@@ -1,6 +1,7 @@
 package back.tickita.application.notification.service;
 
 import back.tickita.application.notification.dto.request.InviteAcceptWitdrawlRequest;
+import back.tickita.application.notification.dto.request.IsCheckedRequest;
 import back.tickita.application.notification.dto.request.NotificationRequest;
 import back.tickita.application.notification.dto.response.InviteNotificationResponse;
 import back.tickita.domain.account.entity.Account;
@@ -8,13 +9,17 @@ import back.tickita.domain.account.repository.AccountRepository;
 import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.enums.CrewAccept;
 import back.tickita.domain.crews.repository.CrewListRepository;
+import back.tickita.domain.notification.entity.CoordinationNotification;
 import back.tickita.domain.notification.entity.Notification;
+import back.tickita.domain.notification.repository.CoordinationNotificationRepository;
 import back.tickita.domain.notification.repository.NotificationRepository;
 import back.tickita.exception.ErrorCode;
 import back.tickita.exception.TickitaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public class NotificationWriteService {
     private final AccountRepository accountRepository;
     private final CrewListRepository crewListRepository;
     private final NotificationRepository notificationRepository;
+    private final CoordinationNotificationRepository coordinationNotificationRepository;
 
 
     public InviteNotificationResponse setInviteAccept(Long accountId, NotificationRequest notificationRequest){
@@ -49,5 +55,21 @@ public class NotificationWriteService {
             crewListRepository.delete(crewListWait);
         }
         return "초대한 그룹원이 삭제되었습니다.";
+    }
+
+    public String updateIsChecked(Long accountId, Long notificationId, IsCheckedRequest isCheckedRequest) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Notification notifications = notificationRepository.findById(notificationId).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+        notifications.update(isCheckedRequest.getIsChecked());
+        return "isChecked 변경 완료";
+    }
+
+    public String notificationWithdrawal(Long accountId, Long notificationId){
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Notification notifications = notificationRepository.findById(notificationId).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+        if (notifications.getIsChecked() == true) {
+            notificationRepository.delete(notifications);
+        }
+        return "알림 삭제 완료";
     }
 }

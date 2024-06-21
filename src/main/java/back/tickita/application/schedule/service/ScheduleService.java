@@ -9,13 +9,18 @@ import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.entity.Crews;
 import back.tickita.domain.crews.repository.CrewListRepository;
 import back.tickita.domain.crews.repository.CrewsRepository;
+import back.tickita.domain.notification.entity.CoordinationNotification;
+import back.tickita.domain.notification.entity.Notification;
+import back.tickita.domain.notification.eums.NotificationType;
+import back.tickita.domain.notification.repository.CoordinationNotificationRepository;
+import back.tickita.domain.notification.repository.NotificationRepository;
 import back.tickita.domain.schedule.entity.Participant;
 import back.tickita.domain.schedule.entity.Schedule;
 import back.tickita.domain.schedule.repository.ParticipantRepository;
 import back.tickita.domain.schedule.repository.ScheduleRepository;
 import back.tickita.exception.ErrorCode;
 import back.tickita.exception.TickitaException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
@@ -32,6 +37,8 @@ public class ScheduleService {
     private final CrewListRepository crewListRepository;
     private final ParticipantRepository participantRepository;
     private final AccountRepository accountRepository;
+    private final CoordinationNotificationRepository coordinationNotificationRepository;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public ScheduleResponse createSchedule(Long accountId, ScheduleRequest request) {
@@ -53,6 +60,28 @@ public class ScheduleService {
         return convertToScheduleResponse(schedule, accountId);
     }
 
+    private List<Participant> convertToParticipants(List<ScheduleRequest.ParticipantInfo> participantInfos, Crews crews, Schedule schedule) {
+        Set<Long> crewMemberIds = crews.getCrewLists().stream()
+                .map(crewMember -> crewMember.getAccount().getId())
+                .collect(Collectors.toSet());
+
+        List<Participant> participants = new ArrayList<>();
+        for (ScheduleRequest.ParticipantInfo participantInfo : participantInfos) {
+            if (!crewMemberIds.contains(participantInfo.getAccountId())) {
+                throw new IllegalArgumentException("Participant with ID " + participantInfo.getAccountId() + " does not belong to the specified crew.");
+            }
+            Account foundAccount  = crews.getCrewLists().stream()
+                    .map(CrewList::getAccount)
+                    .filter(account -> account.getId().equals(participantInfo.getAccountId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Account with ID " + participantInfo.getAccountId() + " not found in crew."));
+            Notification savedNotification = notificationRepository.save(new Notification(NotificationType.UPDATE,foundAccount));
+            CoordinationNotification coordinationNotification = new CoordinationNotification(savedNotification, schedule);
+            coordinationNotificationRepository.save(coordinationNotification);
+            participants.add(new Participant(foundAccount));
+        }
+        return participants;
+    }
     private List<Participant> convertToParticipants(List<ScheduleRequest.ParticipantInfo> participantInfos, Crews crews) {
         Set<Long> crewMemberIds = crews.getCrewLists().stream()
                 .map(crewMember -> crewMember.getAccount().getId())
@@ -98,7 +127,7 @@ public class ScheduleService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid group ID"));
 
         // 요청된 participants와 일치하는 Participant 객체를 생성
-        List<Participant> participants = convertToParticipants(request.getParticipants(), crews);
+        List<Participant> participants = convertToParticipants(request.getParticipants(), crews,schedule);
         participants.add(new Participant(updater));
 
         schedule.setSchedule(request, crews, participants, false);

@@ -28,6 +28,8 @@ public interface VoteListRepository extends JpaRepository<VoteList, Long> {
             """, nativeQuery = true)
     List<VoteCount> countByVoteSubject(@Param("endDate") LocalDate endDate, @Param("endTime") LocalTime endTime);
 
+    long countByVoteSubjectId(Long voteSubjectId);
+
     List<VoteList> findAllByVoteSubjectId(Long voteSubjectId);
 
     @Query("""
