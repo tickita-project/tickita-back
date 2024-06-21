@@ -13,5 +13,5 @@ public class NotificationResponse {
     @Schema(description = "isChecked가 false인 개수", example = "1")
     private Long count;
 
-    private List<CrewNotificationResponse> crewNotificationResponse;
+    private List<NotificationInfo> notificationInfo;
 }

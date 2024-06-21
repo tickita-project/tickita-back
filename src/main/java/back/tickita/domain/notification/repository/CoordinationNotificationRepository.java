@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CoordinationNotificationRepository extends JpaRepository<CoordinationNotification, Long> {
@@ -19,4 +20,8 @@ public interface CoordinationNotificationRepository extends JpaRepository<Coordi
             "JOIN vote_subject vs ON cn.vote_subject_id = vs.id " +
             "WHERE vs.end_date < :time", nativeQuery = true)
     List<CoordinationNotification> findAllExpiredNotifications(LocalDateTime time);
+
+    Optional<CoordinationNotification> findByVoteSubjectId(Long voteSubjectId);
+
+    Optional<CoordinationNotification> findByNotificationId(Long notificationId);
 }

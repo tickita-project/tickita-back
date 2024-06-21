@@ -18,5 +18,4 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findAllByCrews(Crews crews);
 
     List<Schedule> findTop10ByParticipants_Account_IdAndStartDateTimeAfterOrderByStartDateTime(Long accountId, LocalDateTime now);
-
 }

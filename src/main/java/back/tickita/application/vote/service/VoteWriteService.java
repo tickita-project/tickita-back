@@ -74,32 +74,32 @@ public class VoteWriteService {
         VoteSubject savedVoteSubject = voteSubjectRepository.save(voteSubject);
         CrewList creatorCrewList = crewListRepository.findByAccountIdAndCrewsId(account.getId(), voteSubjectRequest.crewId()).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
         VoteList creator = VoteList.creator(creatorCrewList, voteSubject);
-        voteSubjectRequest.voteDateLists().forEach(it -> {
-            VoteState voteState = VoteState.create(it.getVoteDate(), it.getVoteStartTime(), it.getVoteEndTime(), savedVoteSubject);
-            VoteState savedVoteState = voteStateRepository.save(voteState);
-            new VoteComplete(creator,savedVoteState);
-        });
 
         List<VoteList> voteContainer = new ArrayList<>();
 
 
         voteContainer.add(creator);
+        VoteSubject findVoteSubject = voteSubjectRepository.findById(voteSubject.getId()).orElse(null);
         List<VoteList> voteResults = voteSubjectRequest.accountIds().stream().map(it -> {
             CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(it, voteSubjectRequest.crewId()).orElse(null);
 
             if (crewList == null) {
                 throw new TickitaException(ErrorCode.CREW_NOT_FOUND);
             }
+            Notification savedNotification = notificationRepository.save(new Notification(NotificationType.REQUEST, crewList.getAccount()));
+            coordinationNotificationRepository.save(new CoordinationNotification(savedNotification, findVoteSubject));
             return VoteList.participant(crewList, voteSubject);
         }).collect(Collectors.toList());
 
         voteContainer.addAll(voteResults);
         voteListRepository.saveAll(voteContainer);
+        voteSubjectRequest.voteDateLists().forEach(it -> {
+            VoteState voteState = VoteState.create(it.getVoteDate(), it.getVoteStartTime(), it.getVoteEndTime(), savedVoteSubject);
+            VoteState savedVoteState = voteStateRepository.save(voteState);
+            VoteComplete voteComplete = new VoteComplete(creator, savedVoteState);
+            voteCompleteRepository.save(voteComplete);
+        });
 
-        VoteSubject findVoteSubject = voteSubjectRepository.findById(voteSubject.getId()).orElse(null);
-
-        Notification savedNotification = notificationRepository.save(new Notification(NotificationType.REQUEST));
-        coordinationNotificationRepository.save(new CoordinationNotification(savedNotification, findVoteSubject));
     }
 
     public void setVote(Long accountId, VoteStateRequest voteStateRequest, Long voteSubjectId) {
@@ -118,6 +118,17 @@ public class VoteWriteService {
         List<VoteComplete> voteCompletes = voteStates.stream().map(voteState -> new VoteComplete(voteList, voteState)).collect(Collectors.toList()); // 투표 참석자 내역 저장
         voteCompleteRepository.saveAll(voteCompletes);
         voteList.setVoteType(true);
+
+        CoordinationNotification coordinationNotification = coordinationNotificationRepository.findByVoteSubjectId(voteSubject.getId()).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+        Notification notification = coordinationNotification.getNotification();
+        notification.update(true);
+
+        Integer voteCompleteCount = voteCompleteRepository.countVoteComplete(voteSubjectId);
+        long voteParticipateCount = voteListRepository.countByVoteSubjectId(voteSubjectId);
+        if (voteCompleteCount != null && voteCompleteCount == voteParticipateCount) {
+            voteSubjectRepository.updateVoteEndType(voteSubjectId);
+            createSchedule(voteSubject);
+        }
     }
 
     //투표 동률일 때 -> 가장 빠른 날짜와 시간대 리스트로 적용 -> 일정 테이블에 자동 저장
@@ -141,11 +152,9 @@ public class VoteWriteService {
         // 마감 상태가 아닌데 마감시간인것들 마감으로 변환
         List<VoteSubject> voteSubjects = voteSubjectRepository.findAllByVoteEndTypeAndEndDateAndEndTime(VoteEndType.PROGRESS, nowDate, nowTime);
         for (VoteSubject voteSubject : voteSubjects) {
-
             voteSubject.update(); // change status progress -> finish
             createSchedule(voteSubject);
         }
-
 
         //마감 되지 않아도 투표가 완료되면 변경
         List<VoteCount> voteCounts = voteListRepository.countByVoteSubject(nowDate, nowTime); // 전체 투표 별 참여 인원수 추출
@@ -155,7 +164,7 @@ public class VoteWriteService {
             if (voteCompleteCount != null && voteCompleteCount == voteCount.getVoteParticipateCount()) {
                 voteSubjectRepository.updateVoteEndType(voteCount.getVoteSubjectId());
                 VoteSubject voteSubject = voteSubjectRepository.findById(voteCount.getVoteSubjectId()).orElse(null);
-                if(voteSubject == null) {
+                if (voteSubject == null) {
                     continue;
                 }
                 createSchedule(voteSubject);
@@ -169,7 +178,7 @@ public class VoteWriteService {
             errorLogRepository.save(ErrorLog.create(400, "Schedule", HttpStatus.BAD_REQUEST.name(), "일정 현황이 존재하지 않습니다.", httpServletRequest.getRequestURI()));
             return;
         }
-        LocalDateTime startDateTime =  LocalDateTime.of(voteState.getScheduleDate().getYear(), voteState.getScheduleDate().getMonth(), voteState.getScheduleDate().getDayOfMonth(),
+        LocalDateTime startDateTime = LocalDateTime.of(voteState.getScheduleDate().getYear(), voteState.getScheduleDate().getMonth(), voteState.getScheduleDate().getDayOfMonth(),
                 voteState.getScheduleStartTime().getHour(), voteState.getScheduleStartTime().getMinute(), voteState.getScheduleStartTime().getSecond());
         LocalDateTime endDateTime = LocalDateTime.of(voteState.getScheduleDate().getYear(), voteState.getScheduleDate().getMonth(), voteState.getScheduleDate().getDayOfMonth(),
                 voteState.getScheduleEndTime().getHour(), voteState.getScheduleEndTime().getMinute(), voteState.getScheduleEndTime().getSecond());
@@ -182,8 +191,14 @@ public class VoteWriteService {
             int voteListCompleteSize = voteList.getComplete().size();
             Account account = voteList.getAccount();
             if (voteListCompleteSize == 0 || account == null) {
+                Notification savedNotification = notificationRepository.save(new Notification(NotificationType.EXCLUDE, account));
+                CoordinationNotification coordinationNotification = new CoordinationNotification(savedNotification, voteSubject, savedSchedule);
+                coordinationNotificationRepository.save(coordinationNotification);
                 continue;
             }
+            Notification savedNotification = notificationRepository.save(new Notification(NotificationType.SCHEDULE_INFO, account));
+            CoordinationNotification coordinationNotification = new CoordinationNotification(savedNotification, voteSubject, savedSchedule);
+            coordinationNotificationRepository.save(coordinationNotification);
             participantRepository.save(new Participant(account, savedSchedule));
         }
     }

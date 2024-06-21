@@ -16,9 +16,6 @@ public class InviteAcceptWitdrawlRequest {
     @Schema(description = "회원 id", example = "1")
     private Long accountId;
 
-    @Schema(description = "알림 id", example = "1")
-    private Long notificationId;
-
     @Schema(description = "그룹 초대 상태값", example = "ACCEPT, DECLINE, WAIT")
     private CrewAccept crewAccept;
 }
