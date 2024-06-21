@@ -89,6 +89,7 @@ public class SecurityConfig {
         config.addAllowedOrigin("http://localhost:3000/");
         config.addAllowedOrigin("http://15.165.82.167");
         config.addAllowedOrigin("http://15.165.82.167:8080");
+        config.addAllowedOrigin("https://api.tickita.net/");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
