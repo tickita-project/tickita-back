@@ -80,9 +80,11 @@ public class OauthService {
     }
 
     @Transactional(noRollbackFor = TickitaException.class)
-    public TokenResponse kakaoLogin(String code, String redirectUrl) {
+    public TokenResponse kakaoLogin(String code, String currentDomain) {
+        String redirectUri = selectRedirectUri(currentDomain);
+
         // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getAccessToken(code, redirectUrl);
+        String accessToken = getAccessToken(code,currentDomain);
 
         // 2. 토큰으로 카카오 API 호출
         HashMap<String, Object> userInfo= getKakaoUserInfo(accessToken);
@@ -92,8 +94,17 @@ public class OauthService {
         return kakaoUserLogin(userInfo);
     }
 
+    public String selectRedirectUri(String currentDomain) {
+        if (currentDomain.contains("localhost")){
+            return "http://localhost:3000/sign-in/kakao";
+        }else {
+            return KAKAO_REDIRECT_URI;
+        }
+    }
+
+
     //1. "인가 코드"로 "액세스 토큰" 요청
-    private String getAccessToken(String code, String redirectUrl) {
+    private String getAccessToken(String code, String redirectUri) {
 
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
@@ -103,7 +114,13 @@ public class OauthService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 
         String requestURL = httpServletRequest.getRequestURL().toString();
+        String originHeader = httpServletRequest.getHeader("Origin");
+        String referer = httpServletRequest.getHeader("Referer");
+
         System.out.println("requestURL = " + requestURL);
+        System.out.println("originHeader = " + originHeader);
+        System.out.println("referer = " + referer);
+
 //        if (requestURL.contains("login/oauth/kakao")){
 //            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
 //        } else {
@@ -113,7 +130,7 @@ public class OauthService {
 
         body.add("grant_type", "authorization_code");
         body.add("client_id", KAKAO_CLIENT_ID);
-        body.add("redirect_uri", redirectUrl);
+        body.add("redirect_uri", redirectUri);
         body.add("client_secret", KAKAO_SECRET_ID);
         body.add("code", code);
         // HTTP 요청 보내기
