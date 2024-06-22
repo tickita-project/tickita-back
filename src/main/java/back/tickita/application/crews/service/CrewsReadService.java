@@ -84,7 +84,7 @@ public class CrewsReadService {
                 .stream()
                 .filter(crewAll -> CrewAccept.ACCEPT.equals(crewAll.getCrewAccept()))
                 .map(crewAll -> new CrewAllInfo(
-                        crewAll.getCrews().getId(), crewAll.getCrews().getCrewName(), crewAll.getCrews().getLabelColor()))
+                        crewAll.getCrews().getId(), crewAll.getCrews().getCrewName(), crewAll.getIndividualColor()))
                 .collect(Collectors.toList());
 
         return new CrewAllResponse(crewLists);

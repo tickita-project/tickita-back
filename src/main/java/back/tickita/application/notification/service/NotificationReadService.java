@@ -61,7 +61,7 @@ public class NotificationReadService {
 
         return crewNotifications.stream()
                 .map(crewNotification -> new NotificationInfo(crewNotification.getId(), crewNotification.getNotification().getNotificationType().name(),
-                        crewNotification.getCrewList().getCrews().getId(), crewNotification.getCrewList().getCrews().getLabelColor(),
+                        crewNotification.getCrewList().getCrews().getId(), crewNotification.getCrewList().getIndividualColor(),
                         crewNotification.getCrewList().getCrews().getCrewName(), null, crewNotification.getCreatedAt(), crewNotification.getNotification().getIsChecked(),
                         crewNotification.getNotification().getNotificationType().getContent(), AlarmType.CREW))
                 .collect(Collectors.toList());
@@ -77,9 +77,10 @@ public class NotificationReadService {
                 VoteSubject voteSubject = coordinationNotification.getVoteSubject();
                 NotificationInfo notificationInfo = null;
                 if (voteSubject != null) {
+                    String individualColor = getIndividualColor(accountId, voteSubject.getCrews().getId());
                     notificationInfo = new NotificationInfo(
                             notification.getId(), notification.getNotificationType().name(), voteSubject.getCrews().getId(),
-                            voteSubject.getCrews().getLabelColor(), voteSubject.getCrews().getCrewName(),null ,
+                            individualColor, voteSubject.getCrews().getCrewName(),null ,
                             notification.getCreatedAt(), notification.getIsChecked(), notification.getNotificationType().getContent(),AlarmType.SCHEDULE
                     );
                     if(coordinationNotification.getSchedule() != null) {
@@ -88,9 +89,10 @@ public class NotificationReadService {
                 }
                 else if(coordinationNotification.getSchedule() != null) {
                     Schedule schedule = coordinationNotification.getSchedule();
+                    String individualColor = getIndividualColor(accountId, schedule.getCrews().getId());
                     notificationInfo = new NotificationInfo(
                             notification.getId(), notification.getNotificationType().name(), schedule.getCrews().getId(),
-                            schedule.getCrews().getLabelColor(), schedule.getCrews().getCrewName(),null ,
+                            individualColor, schedule.getCrews().getCrewName(),null ,
                             notification.getCreatedAt(), notification.getIsChecked(), notification.getNotificationType().getContent(),AlarmType.SCHEDULE
                     );
                 }
@@ -98,5 +100,11 @@ public class NotificationReadService {
             }
         }
         return notificationInfos;
+    }
+
+    private String getIndividualColor(Long accountId, Long crewId) {
+        CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(accountId, crewId)
+                .orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
+        return crewList.getIndividualColor();
     }
 }
