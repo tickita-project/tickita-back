@@ -51,7 +51,7 @@ public class NotificationWriteService {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
         CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(account.getId(), inviteAcceptWitdrawlRequest.getCrewId()).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
         if (inviteAcceptWitdrawlRequest.getCrewAccept() == CrewAccept.WAIT) {
-            CrewList crewListWait = crewListRepository.findByAccountIdAndCrewAccept(inviteAcceptWitdrawlRequest.getAccountId(), inviteAcceptWitdrawlRequest.getCrewAccept()).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
+            CrewList crewListWait = crewListRepository.findByAccountIdAndCrewsIdAndCrewAccept(inviteAcceptWitdrawlRequest.getAccountId(), inviteAcceptWitdrawlRequest.getCrewId(), inviteAcceptWitdrawlRequest.getCrewAccept()).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
             crewListRepository.delete(crewListWait);
         }
         return "초대한 그룹원이 삭제되었습니다.";
