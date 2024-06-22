@@ -10,8 +10,10 @@ import back.tickita.domain.crews.entity.CrewList;
 import back.tickita.domain.crews.enums.CrewAccept;
 import back.tickita.domain.crews.repository.CrewListRepository;
 import back.tickita.domain.notification.entity.CoordinationNotification;
+import back.tickita.domain.notification.entity.CrewNotification;
 import back.tickita.domain.notification.entity.Notification;
 import back.tickita.domain.notification.repository.CoordinationNotificationRepository;
+import back.tickita.domain.notification.repository.CrewNotificationRepository;
 import back.tickita.domain.notification.repository.NotificationRepository;
 import back.tickita.exception.ErrorCode;
 import back.tickita.exception.TickitaException;
@@ -29,6 +31,7 @@ public class NotificationWriteService {
     private final AccountRepository accountRepository;
     private final CrewListRepository crewListRepository;
     private final NotificationRepository notificationRepository;
+    private final CrewNotificationRepository crewNotificationRepository;
     private final CoordinationNotificationRepository coordinationNotificationRepository;
 
 
@@ -59,8 +62,15 @@ public class NotificationWriteService {
 
     public String updateIsChecked(Long accountId, Long notificationId, IsCheckedRequest isCheckedRequest) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
-        Notification notifications = notificationRepository.findById(notificationId).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
-        notifications.update(isCheckedRequest.getIsChecked());
+        if (isCheckedRequest.getAlarmType().equals("CREW")){
+            CrewNotification crewNotification = crewNotificationRepository.findById(notificationId).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+            crewNotification.getNotification().update(isCheckedRequest.getIsChecked());
+        } else if (isCheckedRequest.getAlarmType().equals("SCHEDULE")) {
+            CoordinationNotification coordinationNotification = coordinationNotificationRepository.findById(notificationId).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+            coordinationNotification.getNotification().update(isCheckedRequest.getIsChecked());
+        } else {
+            throw new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND);
+        }
         return "isChecked 변경 완료";
     }
 

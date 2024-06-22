@@ -9,4 +9,7 @@ import lombok.Setter;
 public class IsCheckedRequest {
     @Schema(description = "알림 여부 확인", example = "false/true")
     private Boolean isChecked;
+
+    @Schema(description = "알림 타입", example = "CREW, SCHEDULE")
+    private String alarmType;
 }
