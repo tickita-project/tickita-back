@@ -62,7 +62,7 @@ public class NotificationReadService {
         return crewNotifications.stream()
                 .map(crewNotification -> new NotificationInfo(crewNotification.getId(), crewNotification.getNotification().getNotificationType().name(),
                         crewNotification.getCrewList().getCrews().getId(), crewNotification.getCrewList().getCrews().getLabelColor(),
-                        crewNotification.getCrewList().getCrews().getCrewName(), null, crewNotification.getCreatedAt(), false,
+                        crewNotification.getCrewList().getCrews().getCrewName(), null, crewNotification.getCreatedAt(), crewNotification.getNotification().getIsChecked(),
                         crewNotification.getNotification().getNotificationType().getContent(), AlarmType.CREW))
                 .collect(Collectors.toList());
     }
