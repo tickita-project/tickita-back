@@ -19,8 +19,8 @@ public class LoginController {
 
     @GetMapping("/login/oauth/kakao")
     @Operation(summary = "kakao 로그인", description = "로그인 한 회원의 정보를 등록합니다.")
-    public ResponseEntity<TokenResponse> kakaoLogin(@RequestParam String code) {
-        return ResponseEntity.ok(oauthService.kakaoLogin(code));
+    public ResponseEntity<TokenResponse> kakaoLogin(@RequestParam String code, @RequestParam String redirectUrl) {
+        return ResponseEntity.ok(oauthService.kakaoLogin(code, redirectUrl));
     }
 
     @GetMapping("/login/oauth2/code/google")

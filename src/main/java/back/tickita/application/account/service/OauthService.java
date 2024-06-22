@@ -80,9 +80,9 @@ public class OauthService {
     }
 
     @Transactional(noRollbackFor = TickitaException.class)
-    public TokenResponse kakaoLogin(String code) {
+    public TokenResponse kakaoLogin(String code, String redirectUrl) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getAccessToken(code);
+        String accessToken = getAccessToken(code, redirectUrl);
 
         // 2. 토큰으로 카카오 API 호출
         HashMap<String, Object> userInfo= getKakaoUserInfo(accessToken);
@@ -93,7 +93,7 @@ public class OauthService {
     }
 
     //1. "인가 코드"로 "액세스 토큰" 요청
-    private String getAccessToken(String code) {
+    private String getAccessToken(String code, String redirectUrl) {
 
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
@@ -104,16 +104,16 @@ public class OauthService {
 
         String requestURL = httpServletRequest.getRequestURL().toString();
         System.out.println("requestURL = " + requestURL);
-        if (requestURL.contains("login/oauth/kakao")){
-            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
-        } else {
-            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
-        }
+//        if (requestURL.contains("login/oauth/kakao")){
+//            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
+//        } else {
+//            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
+//        }
         System.out.println("KAKAO_REDIRECT_URI = " + KAKAO_REDIRECT_URI);
 
         body.add("grant_type", "authorization_code");
         body.add("client_id", KAKAO_CLIENT_ID);
-        body.add("redirect_uri", KAKAO_REDIRECT_URI);
+        body.add("redirect_uri", redirectUrl);
         body.add("client_secret", KAKAO_SECRET_ID);
         body.add("code", code);
         // HTTP 요청 보내기
