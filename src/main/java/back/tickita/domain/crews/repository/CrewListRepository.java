@@ -26,4 +26,6 @@ public interface CrewListRepository extends JpaRepository<CrewList, Long> {
     Optional<CrewList> findByAccountIdAndCrewAccept(Long accountId, CrewAccept crewAccept);
 
     Optional<CrewList> findByAccountIdAndCrewsIdAndCrewAccept(Long accountId, Long crewId, CrewAccept crewAccept);
+
+    List<CrewList>findAllByAccountIdAndCrewsIsNotNull(Long accountId);
 }
