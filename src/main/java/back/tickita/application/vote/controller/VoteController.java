@@ -46,10 +46,11 @@ public class VoteController {
         voteWriteService.setVote(loginUserInfo.accountId(), voteStateRequest, voteSubjectId);
     }
 
-    @GetMapping("participant/{crewId}/{voteSubjectId}")
+    @GetMapping("/participant")
     @Operation(summary = "일정 조율 참석자 일정 리스트", description = "일정 조율 참석자의 일정 있는 리스트를 조회합니다.")
-    public VoteParticipantTimeList findParticipantTime(@PathVariable(value = "crewId") Long crewId, @PathVariable(value = "voteSubjectId") Long voteSubjectId){
-        return voteReadService.findParticipantTime(crewId, voteSubjectId);
+    public ResponseEntity<VoteParticipantTimeList> findParticipantTime(@RequestParam List<Long> participantId, @RequestParam List<LocalDate> selectedDates){
+        VoteParticipantTimeList participantTimeList = voteReadService.findParticipantTime(participantId, selectedDates);
+        return ResponseEntity.ok(participantTimeList);
     }
 
     @GetMapping

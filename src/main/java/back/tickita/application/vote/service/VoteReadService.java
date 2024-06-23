@@ -33,7 +33,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +69,7 @@ public class VoteReadService {
 
         List<VoteList> participant = voteListRepository.findAllByVoteSubjectIdAndVoteType(voteSubject.getId(), VoteType.PARTICIPANT);
         List<VoteListResponse> voteListResponses = participant.stream()
-                .map(it -> new VoteListResponse(it.getCrewList().getAccount().getId(), it.getCrewList().getAccount().getNickName(), false))
+                .map(it -> new VoteListResponse(it.getCrewList().getAccount().getId(), it.getCrewList().getAccount().getNickName(), it.getVoteParticipateType()))
                 .collect(Collectors.toList());
 
         List<VoteState> voteDates = voteStateRepository.findByVoteSubjectId(voteSubject.getId());
@@ -83,25 +85,37 @@ public class VoteReadService {
                 creatorVote.getCrewList().getAccount().getId(), creatorVote.getCrewList().getAccount().getNickName(), voteListResponses, voteSubject.getEndTime(), voteSubject.getEndDate(), voteDateListResponses, remainTime);
     }
 
-    public VoteParticipantTimeList findParticipantTime(Long crewId, Long voteSubjectId) {
-        Crews crews = crewsRepository.findById(crewId).orElseThrow(() -> new TickitaException(ErrorCode.CREW_NOT_FOUND));
-
-        List<VoteList> voteLists = voteListRepository.findAllByVoteSubjectId(voteSubjectId);
+    public VoteParticipantTimeList findParticipantTime(List<Long> participantId, List<LocalDate> selectedDates) {
+        List<CrewList> selectedCrewLists = new ArrayList<>();
+        for (Long accountId : participantId) {
+            List<CrewList> crewLists = crewListRepository.findAllByAccountIdAndCrewsIsNotNull(accountId);
+            selectedCrewLists.addAll(crewLists);
+        }
 
         List<ParticipantTime> participantTimes = new ArrayList<>();
-        for (VoteList voteList : voteLists) {
-            CrewList crewList = voteList.getCrewList();
-            List<Schedule> schedules = scheduleRepository.findAllByCrews(crews);
+        for (LocalDate selectedDate : selectedDates) {
+            LocalDateTime startOfDay = selectedDate.atStartOfDay();
+            LocalDateTime endOfDay = selectedDate.atTime(23, 59, 59);
 
-            for (Schedule schedule : schedules) {
-                ParticipantTime participantTime = new ParticipantTime();
-                participantTime.setParticipant(crewList.getAccount().getId(), schedule.getStartDateTime(), schedule.getEndDateTime());
-                participantTimes.add(participantTime);
+            for (CrewList selectedCrewList : selectedCrewLists) {
+                Crews crews = selectedCrewList.getCrews();
+
+                List<Schedule> schedules = scheduleRepository.findAllByCrewsAndStartDateTimeBetween(crews, startOfDay, endOfDay);
+
+                for (Schedule schedule : schedules) {
+                    List<Participant> participants = schedule.getParticipants();
+                    for (Participant participant : participants) {
+                        Long participantAccountId = participant.getAccount().getId();
+                        ParticipantTime participantTime = new ParticipantTime();
+                        participantTime.setParticipant(participantAccountId, schedule.getStartDateTime(), schedule.getEndDateTime());
+                        participantTimes.add(participantTime);
+                    }
+                }
             }
         }
+
         VoteParticipantTimeList voteParticipantTimeList = new VoteParticipantTimeList();
         voteParticipantTimeList.setParticipantTimes(participantTimes);
-
         return voteParticipantTimeList;
     }
 
