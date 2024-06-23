@@ -48,9 +48,9 @@ public class VoteController {
 
     @GetMapping("/participant")
     @Operation(summary = "일정 조율 참석자 일정 리스트", description = "일정 조율 참석자의 일정 있는 리스트를 조회합니다.")
-    public ResponseEntity<VoteParticipantTimeList> findParticipantTime(@RequestParam List<Long> participantId, @RequestParam List<LocalDate> selectedDates){
-        VoteParticipantTimeList participantTimeList = voteReadService.findParticipantTime(participantId, selectedDates);
-        return ResponseEntity.ok(participantTimeList);
+    public VoteParticipantTimeList findParticipantTime(@LoginUser LoginUserInfo loginUserInfo, @RequestParam List<Long> participantId, @RequestParam List<LocalDate> selectedDates){
+        VoteParticipantTimeList participantTimeList = voteReadService.findParticipantTime(loginUserInfo.accountId(),participantId, selectedDates);
+        return participantTimeList;
     }
 
     @GetMapping

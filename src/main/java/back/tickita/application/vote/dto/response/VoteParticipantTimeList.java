@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 public class VoteParticipantTimeList {
-    private List<ParticipantTime> participantTimes;
+    private Set<ParticipantTime> participantTimes;
 
-    public void setParticipantTimes(List<ParticipantTime> participantTimes) {
+    public void setParticipantTimes(Set<ParticipantTime> participantTimes) {
         this.participantTimes = participantTimes;
     }
 }

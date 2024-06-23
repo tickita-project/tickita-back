@@ -16,6 +16,7 @@ import back.tickita.domain.notification.repository.CoordinationNotificationRepos
 import back.tickita.domain.notification.repository.NotificationRepository;
 import back.tickita.domain.schedule.entity.Participant;
 import back.tickita.domain.schedule.entity.Schedule;
+import back.tickita.domain.schedule.repository.ParticipantRepository;
 import back.tickita.domain.schedule.repository.ScheduleRepository;
 import back.tickita.domain.vote.entity.VoteComplete;
 import back.tickita.domain.vote.entity.VoteList;
@@ -36,9 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -55,6 +54,7 @@ public class VoteReadService {
     private final VoteStateRepository voteStateRepository;
     private final ScheduleRepository scheduleRepository;
     private final CoordinationNotificationRepository coordinationNotificationRepository;
+    private final ParticipantRepository participantRepository;
 
     public VoteStateResponse findVoteState(Long accountId, Long crewId, Long voteSubjectId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -85,35 +85,18 @@ public class VoteReadService {
                 creatorVote.getCrewList().getAccount().getId(), creatorVote.getCrewList().getAccount().getNickName(), voteListResponses, voteSubject.getEndTime(), voteSubject.getEndDate(), voteDateListResponses, remainTime);
     }
 
-    public VoteParticipantTimeList findParticipantTime(List<Long> participantId, List<LocalDate> selectedDates) {
-        List<CrewList> selectedCrewLists = new ArrayList<>();
-        for (Long accountId : participantId) {
-            List<CrewList> crewLists = crewListRepository.findAllByAccountIdAndCrewsIsNotNull(accountId);
-            selectedCrewLists.addAll(crewLists);
-        }
-
-        List<ParticipantTime> participantTimes = new ArrayList<>();
+    public VoteParticipantTimeList findParticipantTime(Long loginAccountId, List<Long> participantId, List<LocalDate> selectedDates) {
+        Set<ParticipantTime> participantTimes = new HashSet<>();
+        participantId.add(loginAccountId);
         for (LocalDate selectedDate : selectedDates) {
-            LocalDateTime startOfDay = selectedDate.atStartOfDay();
-            LocalDateTime endOfDay = selectedDate.atTime(23, 59, 59);
-
-            for (CrewList selectedCrewList : selectedCrewLists) {
-                Crews crews = selectedCrewList.getCrews();
-
-                List<Schedule> schedules = scheduleRepository.findAllByCrewsAndStartDateTimeBetween(crews, startOfDay, endOfDay);
-
-                for (Schedule schedule : schedules) {
-                    List<Participant> participants = schedule.getParticipants();
-                    for (Participant participant : participants) {
-                        Long participantAccountId = participant.getAccount().getId();
-                        ParticipantTime participantTime = new ParticipantTime();
-                        participantTime.setParticipant(participantAccountId, schedule.getStartDateTime(), schedule.getEndDateTime());
+            for (Long accountId : participantId) {
+                List<Participant> participants = participantRepository.findAllSchedule(selectedDate, accountId);
+                for (Participant participant : participants) {
+                        ParticipantTime participantTime = new ParticipantTime(participant.getSchedule().getStartDateTime(), participant.getSchedule().getEndDateTime());
                         participantTimes.add(participantTime);
                     }
                 }
             }
-        }
-
         VoteParticipantTimeList voteParticipantTimeList = new VoteParticipantTimeList();
         voteParticipantTimeList.setParticipantTimes(participantTimes);
         return voteParticipantTimeList;
