@@ -84,7 +84,7 @@ public class OauthService {
         String redirectUri = selectRedirectUri(currentDomain);
 
         // 1. "인가 코드"로 "액세스 토큰" 요청
-        String accessToken = getAccessToken(code,currentDomain);
+        String accessToken = getAccessToken(code, currentDomain);
 
         // 2. 토큰으로 카카오 API 호출
         HashMap<String, Object> userInfo= getKakaoUserInfo(accessToken);
@@ -95,6 +95,7 @@ public class OauthService {
     }
 
     public String selectRedirectUri(String currentDomain) {
+        System.out.println(currentDomain);
         if (currentDomain.contains("localhost")){
             return "http://localhost:3000/sign-in/kakao";
         }else {
@@ -113,20 +114,13 @@ public class OauthService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 
-        String requestURL = httpServletRequest.getRequestURL().toString();
+        String requestURL = httpServletRequest.getRequestURI().toString();
         String originHeader = httpServletRequest.getHeader("Origin");
         String referer = httpServletRequest.getHeader("Referer");
 
         System.out.println("requestURL = " + requestURL);
         System.out.println("originHeader = " + originHeader);
         System.out.println("referer = " + referer);
-
-//        if (requestURL.contains("login/oauth/kakao")){
-//            KAKAO_REDIRECT_URI = "http://localhost:3000/sign-in/kakao";
-//        } else {
-//            KAKAO_REDIRECT_URI = "https://tickita.net/sign-in/kakao";
-//        }
-        System.out.println("KAKAO_REDIRECT_URI = " + KAKAO_REDIRECT_URI);
 
         body.add("grant_type", "authorization_code");
         body.add("client_id", KAKAO_CLIENT_ID);
@@ -217,7 +211,7 @@ public class OauthService {
             return new TokenResponse(kakaoUser.getId(), null, null, null, null, null, false,
                     kakaoUser.getEmail(), null, null, null);
         }
-            return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), kakaoUser.isComplete(), String.valueOf(kakaoUser.getRole()));
+        return authTokensGenerator.generate(kakaoUser.getId(), LocalDateTime.now(), kakaoUser.isComplete(), String.valueOf(kakaoUser.getRole()));
     }
 
     @Transactional(noRollbackFor = TickitaException.class)
@@ -240,7 +234,7 @@ public class OauthService {
 
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-		String requestURL = httpServletRequest.getRequestURL().toString();
+        String requestURL = httpServletRequest.getRequestURL().toString();
         if (requestURL.contains("login/oauth2/code/google")){
             GOOGLE_REDIRECT_URI = "http://localhost:3000/sign-in/google";
         } else {

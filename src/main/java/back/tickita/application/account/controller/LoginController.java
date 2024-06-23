@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
 @Tag(name = "소셜 로그인 API", description = "LoginController")
@@ -26,7 +27,17 @@ public class LoginController {
     @Operation(summary = "kakao 로그인", description = "로그인 한 회원의 정보를 등록합니다.")
     public ResponseEntity<TokenResponse> kakaoLogin(@RequestParam String code, HttpServletRequest request) {
         try {
-            String currentDomain = request.getServerName();
+            String currentDomain = request.getRemoteAddr();
+            System.out.println("currentDomain = " + currentDomain);
+            String host = request.getHeader("Host");
+            String origin = request.getHeader("Origin");
+            String referer = request.getHeader("Referer");
+            String forwardedHost = request.getHeader("X-Forwarded-Host");
+
+            System.out.println("host = " + host);
+            System.out.println("origin = " + origin);
+            System.out.println("referer = " + referer);
+            System.out.println("forwardedHost = " + forwardedHost);
             return ResponseEntity.ok(oauthService.kakaoLogin(code, currentDomain));
         } catch (NoSuchElementException e){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item Not Found");
