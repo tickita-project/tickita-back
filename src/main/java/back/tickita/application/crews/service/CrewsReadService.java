@@ -10,7 +10,9 @@ import back.tickita.domain.crews.enums.CrewAccept;
 import back.tickita.domain.crews.enums.CrewRole;
 import back.tickita.domain.crews.repository.CrewListRepository;
 import back.tickita.domain.crews.repository.CrewsRepository;
+import back.tickita.domain.notification.entity.CrewNotification;
 import back.tickita.domain.notification.entity.Notification;
+import back.tickita.domain.notification.repository.CrewNotificationRepository;
 import back.tickita.domain.notification.repository.NotificationRepository;
 import back.tickita.exception.ErrorCode;
 import back.tickita.exception.TickitaException;
@@ -31,6 +33,7 @@ public class CrewsReadService {
     private final AccountRepository accountRepository;
     private final CrewListRepository crewListRepository;
     private final NotificationRepository notificationRepository;
+    private final CrewNotificationRepository crewNotificationRepository;
 
     public CrewInfoResponse getCrewInfo(Long accountId, Long crewId) {
         CrewList crewList = crewListRepository.findByAccountIdAndCrewsId(accountId, crewId).orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -68,10 +71,9 @@ public class CrewsReadService {
                 .stream()
                 .filter(crewInfoList -> crewInfoList.getCrewAccept() == CrewAccept.WAIT)
                 .map(crewInfoList -> {
-//                    Notification notification = notificationRepository.findByCrewListId(crewInfoList.getId()).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
-                    Notification notification = notificationRepository.findByAccountId(crewInfoList.getAccount().getId()).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+                    CrewNotification crewNotification = crewNotificationRepository.findByCrewList(crewInfoList).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
                     return new CrewWaitingMemberInfo(
-                                    notification.getId(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail());
+                            crewNotification.getNotification().getId(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail());
                 }).collect(Collectors.toList());
 
         return new CrewDetailResponse(crews.getCrewName(), crewList.getIndividualColor(), crews.getId(), crewMemberInfos, waitMembers);
