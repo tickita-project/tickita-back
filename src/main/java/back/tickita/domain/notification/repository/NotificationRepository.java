@@ -17,4 +17,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Optional<Notification> findByCrewListId(Long crewListId);
 
     List<Notification> findAllByAccountId(Long accountId);
+
+    Optional<Notification> findByAccountId(Long accountId);
 }

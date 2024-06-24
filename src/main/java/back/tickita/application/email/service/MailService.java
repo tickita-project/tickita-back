@@ -121,7 +121,8 @@ public class MailService {
         CrewList crewList = new CrewList(crews, invite, crews.getLabelColor(), CrewRole.MEMBER, CrewAccept.WAIT);
         crewListRepository.save(crewList);
 
-        Notification savedNotification = notificationRepository.save(new Notification(NotificationType.INVITE));
+//        Notification savedNotification = notificationRepository.save(new Notification(NotificationType.INVITE));
+        Notification savedNotification = notificationRepository.save(new Notification(NotificationType.INVITE, invite));
 
         crewNotificationRepository.save(new CrewNotification(savedNotification, crewList));
 

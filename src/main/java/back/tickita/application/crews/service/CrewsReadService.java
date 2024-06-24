@@ -68,7 +68,8 @@ public class CrewsReadService {
                 .stream()
                 .filter(crewInfoList -> crewInfoList.getCrewAccept() == CrewAccept.WAIT)
                 .map(crewInfoList -> {
-                    Notification notification = notificationRepository.findByCrewListId(crewInfoList.getId()).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+//                    Notification notification = notificationRepository.findByCrewListId(crewInfoList.getId()).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
+                    Notification notification = notificationRepository.findByAccountId(crewInfoList.getAccount().getId()).orElseThrow(() -> new TickitaException(ErrorCode.NOTIFICATION_NOT_FOUND));
                     return new CrewWaitingMemberInfo(
                                     notification.getId(), crewInfoList.getAccount().getId(), crewInfoList.getAccount().getNickName(), crewInfoList.getAccount().getEmail());
                 }).collect(Collectors.toList());
