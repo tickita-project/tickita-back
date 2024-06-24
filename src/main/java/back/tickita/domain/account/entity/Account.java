@@ -4,6 +4,7 @@ import back.tickita.common.BaseEntity;
 import back.tickita.domain.account.entity.enums.Role;
 import back.tickita.domain.account.enums.SocialType;
 import back.tickita.domain.crews.entity.CrewList;
+import back.tickita.domain.schedule.entity.Participant;
 import back.tickita.domain.token.entity.Token;
 import io.jsonwebtoken.Jwts;
 import jakarta.persistence.*;
@@ -41,6 +42,9 @@ public class Account extends BaseEntity {
 
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Token token;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Participant> participants;
 
     public void setUserInfo(String email, SocialType socialType) {
         this.email = email;
