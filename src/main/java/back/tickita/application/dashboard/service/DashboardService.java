@@ -24,14 +24,22 @@ public class DashboardService {
     public List<EventInfo> getUpcomingEvents(Long accountId) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         LocalDate currentDate = LocalDate.now();
+        LocalDateTime startOfCurrentDay = currentDate.atStartOfDay();
 
-        List<Schedule> schedules = scheduleRepository.findTop10ByParticipants_Account_IdAndStartDateTimeAfterOrderByStartDateTime(accountId, currentDateTime);
+        List<Schedule> schedules = scheduleRepository.findTop10ByAccountIdAndStartDateTimeAfterOrOnSameDayOrderByStartDateTime(accountId, currentDateTime, startOfCurrentDay);
 
         return schedules.stream()
                 .map(schedule -> {
-                    LocalDate eventDate = schedule.getStartDateTime().toLocalDate();
-                    long daysBetween = ChronoUnit.DAYS.between(currentDate, eventDate);
-                    String remainTime = daysBetween == 0 ? "D-DAY" : "D-" + daysBetween;
+                    LocalDateTime eventStartDateTime = schedule.getStartDateTime();
+                    LocalDate eventDate = eventStartDateTime.toLocalDate();
+                    String remainTime;
+
+                    if (eventDate.equals(currentDate)) {
+                        remainTime = "D-DAY";
+                    } else {
+                        long daysBetween = ChronoUnit.DAYS.between(currentDate, eventDate);
+                        remainTime = "D-" + daysBetween;
+                    }
 
                     Crews crews = schedule.getCrews();
                     String individualColor = crews.getCrewLists().stream()
