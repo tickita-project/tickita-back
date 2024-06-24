@@ -54,7 +54,7 @@ public class ScheduleService {
         participants.add(new Participant(account));
 
         Schedule schedule = new Schedule();
-        schedule.setSchedule(request, crews, participants, false);
+        schedule.setSchedule(request, crews, participants, accountId,false);
         scheduleRepository.save(schedule);
 
         return convertToScheduleResponse(schedule, accountId);
@@ -118,9 +118,15 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new NoSuchElementException("Schedule not found"));
 
-        if (schedule.getParticipants().stream()
-                .noneMatch(participant -> participant.getAccount().getId().equals(updater.getId()))) {
-            throw new SecurityException("해당 일정을 변경할 권한이 없습니다.");
+        if (schedule.isCoordinate()) {
+            if (!schedule.getCreatorId().equals(accountId)) {
+                throw new SecurityException("해당 일정을 변경할 권한이 없습니다.");
+            }
+        } else {
+            if (schedule.getParticipants().stream()
+                    .noneMatch(participant -> participant.getAccount().getId().equals(updater.getId()))) {
+                throw new SecurityException("해당 일정을 변경할 권한이 없습니다.");
+            }
         }
 
         Crews crews = crewsRepository.findById(request.getCrewId())
@@ -130,7 +136,7 @@ public class ScheduleService {
         List<Participant> participants = convertToParticipants(request.getParticipants(), crews,schedule);
         participants.add(new Participant(updater));
 
-        schedule.setSchedule(request, crews, participants, false);
+        schedule.setSchedule(request, crews, participants, accountId, false);
         scheduleRepository.save(schedule);
 
         return convertToScheduleResponse(schedule, accountId);
@@ -144,9 +150,15 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new NoSuchElementException("Schedule not found"));
 
-        if (schedule.getParticipants().stream()
-                .noneMatch(participant -> participant.getAccount().getId().equals(deleter.getId()))) {
-            throw new SecurityException("해당 일정을 삭제할 권한이 없습니다.");
+        if (schedule.isCoordinate()) {
+            if (!schedule.getCreatorId().equals(accountId)) {
+                throw new SecurityException("해당 일정을 삭제할 권한이 없습니다.");
+            }
+        } else {
+            if (schedule.getParticipants().stream()
+                    .noneMatch(participant -> participant.getAccount().getId().equals(deleter.getId()))) {
+                throw new SecurityException("해당 일정을 삭제할 권한이 없습니다.");
+            }
         }
         scheduleRepository.delete(schedule);
 

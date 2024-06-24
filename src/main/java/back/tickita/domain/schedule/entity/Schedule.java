@@ -32,6 +32,8 @@ public class Schedule extends BaseEntity {
 
     private String description;
 
+    private Long creatorId;
+
     private boolean isCoordinate;
 
     @ManyToOne
@@ -41,7 +43,7 @@ public class Schedule extends BaseEntity {
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participant> participants = new ArrayList<>();
 
-    public void setSchedule(ScheduleRequest request, Crews crews, List<Participant> participants, boolean isCoordinate) {
+    public void setSchedule(ScheduleRequest request, Crews crews, List<Participant> participants, Long accountId, boolean isCoordinate) {
         this.title = request.getTitle();
         this.startDateTime = request.getStartDateTime();
         this.endDateTime = request.getEndDateTime();
@@ -50,6 +52,7 @@ public class Schedule extends BaseEntity {
         this.crews = crews;
         this.participants.clear();
         this.participants.addAll(participants);
+        this.creatorId = accountId;
         this.isCoordinate = isCoordinate;
 
         // 각 Participant에 Schedule 설정
@@ -58,13 +61,14 @@ public class Schedule extends BaseEntity {
         }
     }
 
-    public Schedule(String title, LocalDateTime startDateTime, LocalDateTime endDateTime, String location, String description, Crews crews, boolean isCoordinate) {
+    public Schedule(String title, LocalDateTime startDateTime, LocalDateTime endDateTime, String location, String description, Crews crews, Long creatorId, boolean isCoordinate) {
         this.title = title;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.location = location;
         this.description = description;
         this.crews = crews;
+        this.creatorId = creatorId;
         this.isCoordinate = isCoordinate;
     }
 }

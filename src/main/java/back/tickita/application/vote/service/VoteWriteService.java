@@ -183,8 +183,12 @@ public class VoteWriteService {
         LocalDateTime endDateTime = LocalDateTime.of(voteState.getScheduleDate().getYear(), voteState.getScheduleDate().getMonth(), voteState.getScheduleDate().getDayOfMonth(),
                 voteState.getScheduleEndTime().getHour(), voteState.getScheduleEndTime().getMinute(), voteState.getScheduleEndTime().getSecond());
 
+        VoteList creatorVote = voteListRepository.findByVoteSubjectIdAndVoteType(voteSubject.getId(), VoteType.CREATOR)
+                .orElseThrow(() -> new TickitaException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Long creatorId = creatorVote.getCrewList().getAccount().getId();
+
         Schedule savedSchedule = scheduleRepository.save(
-                new Schedule(voteSubject.getTitle(), startDateTime, endDateTime, voteSubject.getPlace(), voteSubject.getContent(), voteSubject.getCrews(), true)
+                new Schedule(voteSubject.getTitle(), startDateTime, endDateTime, voteSubject.getPlace(), voteSubject.getContent(), voteSubject.getCrews(), creatorId, true)
         );
         List<VoteList> voteLists = voteListRepository.findAllByVoteSubjectId(voteSubject.getId());
         for (VoteList voteList : voteLists) {
