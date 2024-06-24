@@ -234,12 +234,6 @@ public class OauthService {
 
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        String requestURL = httpServletRequest.getRequestURL().toString();
-        if (requestURL.contains("login/oauth2/code/google")){
-            GOOGLE_REDIRECT_URI = "http://localhost:3000/sign-in/google";
-        } else {
-            GOOGLE_REDIRECT_URI = "https://tickita.net/sign-in/google";
-        }
         body.add("code", code);
         body.add("client_id", GOOGLE_CLIENT_ID);
         body.add("client_secret", GOOGLE_CLIENT_SECRET);
