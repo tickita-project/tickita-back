@@ -1,6 +1,7 @@
 package back.tickita.domain.crews.entity;
 
 import back.tickita.common.BaseEntity;
+import back.tickita.domain.schedule.entity.Schedule;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -22,6 +23,9 @@ public class Crews extends BaseEntity {
 
     @OneToMany(mappedBy = "crews", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CrewList> crewLists;
+
+    @OneToMany(mappedBy = "crews", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Schedule> schedules;
 
     public Crews(String crewName, String labelColor) {
         this.crewName = crewName;
