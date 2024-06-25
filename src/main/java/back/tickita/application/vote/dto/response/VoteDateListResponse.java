@@ -14,6 +14,9 @@ import java.time.LocalTime;
 @Setter
 public class VoteDateListResponse {
 
+    @Schema(description = "일정 조율 현황 id", example = "1")
+    private Long voteStateId;
+
     @Schema(description = "일정 조율 날짜", example = "2024-06-20")
     private LocalDate voteDate;
 
@@ -26,7 +29,8 @@ public class VoteDateListResponse {
     @Schema(description = "투표 개수", example = "1")
     private int voteCount;
 
-    public VoteDateListResponse(LocalDate voteDate, LocalTime voteStartTime, LocalTime voteEndTime, int voteCount) {
+    public VoteDateListResponse(Long voteStateId, LocalDate voteDate, LocalTime voteStartTime, LocalTime voteEndTime, int voteCount) {
+        this.voteStateId = voteStateId;
         this.voteDate = voteDate;
         this.voteStartTime = voteStartTime;
         this.voteEndTime = voteEndTime;

@@ -74,8 +74,9 @@ public class VoteReadService {
 
         List<VoteState> voteDates = voteStateRepository.findByVoteSubjectId(voteSubject.getId());
 
+
         List<VoteDateListResponse> voteDateListResponses = voteDates.stream()
-                .map(it -> new VoteDateListResponse(it.getScheduleDate(), it.getScheduleStartTime(), it.getScheduleEndTime(), it.getVoteCount()))
+                .map(it -> new VoteDateListResponse(it.getId(), it.getScheduleDate(), it.getScheduleStartTime(), it.getScheduleEndTime(), it.getVoteCount()))
                 .collect(Collectors.toList());
 
         VoteState voteState = voteStateRepository.findById(voteSubject.getId()).orElse(null);
